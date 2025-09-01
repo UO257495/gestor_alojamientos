@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head ('Inicio de sesión')}"></th:block>
+</head>
+
+<body>
+    <section class="container">
+        <div class="row align-items-center vh-100">
+
+            <div class="card border-light-subtle shadow-sm g-0">
+                <div class="row g-0">
+                    <div class="col-12 col-md-6">
+                        <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" th:src="@{/img/login.jpg}" alt="Imagen de inicio de sesión">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card-body p-3 p-md-4 p-xl-5">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-5">
+                                        <h3>Gestor de alojamientos</h3>
+                                        <p class="lead">Software de ayuda para la gestión de alojamientos </p>
+                                    </div>
+                                </div>
+
+                                <div th:if="${param.logout}" class="alert alert-success">   <!-- Tratamiento de la URL /login?logout -->
+                                    <i class="fa-regular fa-circle-check"></i> Te has desconectado correctamente.
+                                </div>
+    
+                                <div th:if="${param.error}" class="alert alert-danger">  <!-- Tratamiento de la URL /login?error -->
+                                    <i class="fa-regular fa-circle-xmark"></i> Usuario/contraseña no válidos.
+                                </div>
+
+                                <form th:action="@{/auth/login}" method="post">                            
+                                    <div class="row gy-3 gy-md-4 mb-4 overflow-hidden">
+                                        <div class="col-12">
+                                            <label for="username" class="form-label">Email <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="email" id="email" required autocomplete="false">
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                            <input type="password" class="form-control" name="password" id="password" value="" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-grid">
+                                                <button class="btn bsb-btn-xl btn-primary" type="submit">Iniciar sesión</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</body>
+
+</html>

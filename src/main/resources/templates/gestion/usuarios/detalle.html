@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Usuario')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+	 <section class="container contenido">
+
+        <h1> 
+			<i class="fa-solid fa-user text-secondary"></i> Usuario 
+			<small th:if="${usuario.id != null}" class="text-secondary" th:text="${usuario.nombre}"></small> 
+		</h1>
+
+        <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
+
+        <div class="tab-content">
+
+            <section class="container my-3">
+                
+                <form th:action="${usuario.id == null} ? 'nuevo' : 'editar'" method="post" th:object="${usuario}">
+
+                    <input type="hidden" name="id" th:field="*{id}" />
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Permisos <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="rol" th:field="*{rol}" th:errorclass="is-invalid">
+                                <option th:each="rol : ${roles}" 
+                                        th:value="${rol}" 
+                                        th:text="${rol}">-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <small th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Nombre Completo <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">DNI <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="dni" th:field="*{dni}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Teléfono <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="telefono" th:field="*{telefono}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Email <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="email" th:field="*{email}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Contraseña <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="password" th:field="*{password}" th:errorclass="is-invalid" />
+                            <div class="form-text" th:text="#{validation.password.politica}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="confirmarPassword" class="col-sm-2 col-form-label">Repetir contraseña <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" />
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+            
+                    <div class="my-4 text-end">
+                        <button type="submit" class="btn btn-success ms-2">Guardar</button>
+                        <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/usuarios/lista}">Cerrar</a>
+                    </div>
+                    
+                </form>
+
+            </section>
+            
+
+        </div>
+
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<!-- <th:block th:replace="~{fragments/scripts :: scripts}"></th:block> -->
+    
+</body>
+</html>

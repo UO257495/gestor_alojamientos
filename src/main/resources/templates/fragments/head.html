@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head (titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Importación de CSS y estilos comunes -->
+    <th:block th:replace="~{fragments/styles :: styles}"></th:block>
+
+    <!-- Título dinámico -->
+    <title th:text="'Gestor de Alojamientos > ' + ${titulo}"></title>
+</head>
+</html>

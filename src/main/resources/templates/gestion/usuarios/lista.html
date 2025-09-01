@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Usuarios')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido">
+
+        <h1 class="mb-4">
+            <i class="fa-solid fa-user text-secondary"></i> Usuarios 
+            <a class="btn btn-success btn-sm me-2" title="Nuevo usuario" th:href="@{/gestion/usuarios/detalle}"><i class="fa-solid fa-plus"></i></a>
+        </h1>
+        
+        <table id="tablaUsuarios" class="table table-sm table-striped table-hover" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dni</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th class="dt-right" data-dt-order="disable">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.dni}"></td>
+                    <td th:text="${usuario.email}"></td>
+                    <td th:text="${usuario.telefono}"></td>
+                    <td class="dt-right">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-primary" title="Editar" data-accion="editar" th:data-id="${usuario.id}"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="btn btn-outline-danger" title="Eliminar" data-accion="eliminar" th:data-id="${usuario.id}"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+    <script type="module">
+
+        import * as ui from '[[@{/js/ui.js}]]';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            let dt = new DataTable('#tablaUsuarios', {
+                language: {
+                    url: '[[@{/js/datatables/es-ES.json}]]',
+                },
+            });
+
+            // Botonera
+            document.getElementById('tablaUsuarios').addEventListener('click', evt => {
+                const node = evt.composedPath().find(n => n.dataset && 'id' in n.dataset && 'accion' in n.dataset);
+                if (node) {
+                    const {id, accion} = node.dataset;
+                    if (accion == 'editar') {
+                        const searchParams = new URLSearchParams({ id: id });
+                        window.location.assign('detalle?'+searchParams.toString());
+                    } else if (accion == 'eliminar') {
+                        ui.mostrarConfirmacionModal('Aviso', `El usuario será eliminado, ¿continuar?`, function() {
+                            const searchParams = new URLSearchParams({ id: id });
+                            window.location.assign('eliminar?'+searchParams.toString());
+                        });
+                    }
+                }
+            });
+        });
+	</script>
+
+</body>
+</html>

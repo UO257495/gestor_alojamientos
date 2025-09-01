@@ -1,0 +1,76 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <!-- ====================================================================================== -->
+    <!-- Fragmento del MENÚ PRINCIPAL de la aplicación                                          -->
+    <!-- ====================================================================================== -->
+
+    <nav th:fragment="principal" 
+		class="navbar navbar-expand-lg border-bottom fixed-top p-0 bg-success navbar-dark" 
+		style="background-color: #2E7D32;">
+
+		<div class="container-fluid">
+			
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+					<div >
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+								<i class="fa-solid fa-list-check"></i> Gestión
+							</a>
+							<ul class="dropdown-menu">
+								<li>
+									<a class="dropdown-item" th:href="@{/gestion/usuarios/lista}">
+										<i class="fa-solid fa-video"></i> Usuarios
+									</a>
+								</li>
+							</ul>
+						</li>
+					</div>
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+							<i class="fa-regular fa-circle-user"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							
+							<li>
+								<a class="dropdown-item" th:href="@{/logout}">
+									<i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+								</a>
+							</li>
+						</ul>
+					</li>
+
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+    <!-- ====================================================================================== -->
+    <!-- Fragmento de MENÚ DEL PIE                                                             -->
+    <!-- ====================================================================================== -->
+
+	<footer th:fragment="pie" class="mt-auto py-3 fixed-bottom text-white border-top"
+        style="background-color:#2E7D32;">
+        <div class="container-fluid">
+			&copy; 2025
+			&middot; TFG Nayara Sánchez
+			&middot; v<span th:text="${@environment.getProperty('info.app.version')}"></span>
+			&middot; <span th:text="${#locale}"></span>
+            <ul class="list-inline float-end mb-0">
+                <li class="list-inline-item"><a href="#" class="text-white">Política de privacidad</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white">Contacto</a></li>
+				<li class="list-inline-item" th:title="${@environment.getProperty('info.app.name') + ' v' + @environment.getProperty('info.app.version')}"><i class="fa-solid fa-circle-info"></i></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+</html>

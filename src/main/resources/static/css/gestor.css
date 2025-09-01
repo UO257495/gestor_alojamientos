@@ -1,0 +1,6 @@
+
+.contenido {
+	margin-top: 64px;  /* Espacio reservado para el menú superior e inferior "position:fixed" */
+	margin-bottom: 64px;  /* Espacio reservado para el menú superior e inferior "position:fixed" */
+	overflow: auto;
+}
