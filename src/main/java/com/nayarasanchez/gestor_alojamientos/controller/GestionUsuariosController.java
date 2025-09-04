@@ -1,11 +1,11 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Properties;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Properties;
 
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
@@ -18,8 +18,10 @@ import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,13 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.ui.Model;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import io.micrometer.common.util.StringUtils;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.UsuarioForm;
 import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
@@ -41,6 +36,7 @@ import com.nayarasanchez.gestor_alojamientos.model.Rol;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.repository.UsuarioRepository;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

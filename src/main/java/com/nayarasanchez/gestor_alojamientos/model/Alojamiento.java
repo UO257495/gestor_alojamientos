@@ -33,7 +33,7 @@ public class Alojamiento {
     private String descripcion;
 
     @Column(length = 1000)
-    private String fotos; // Se puede guardar como URL o JSON de URLs
+    private String foto; 
     
     @Column(name = "tarifa_base", nullable = false)
     private Double tarifaBase;
@@ -51,7 +51,7 @@ public class Alojamiento {
     @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL)
     private List<Reserva> reservas;
 
-    @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<Temporada> temporadas;
 
 }

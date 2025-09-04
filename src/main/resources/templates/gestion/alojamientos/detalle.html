@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Alojamiento')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+	 <section class="container contenido">
+
+        <h1> 
+			<i class="fa-solid fa-house text-secondary"></i> Alojamiento 
+			<small th:if="${alojamiento.id != null}" class="text-secondary" th:text="${alojamiento.nombre}"></small> 
+		</h1>
+
+        <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
+
+        <div class="tab-content">
+
+            <section class="container my-3">
+                
+                <form th:action="${alojamiento.id == null} ? 'nuevo' : 'editar'" method="post" th:object="${alojamiento}" enctype="multipart/form-data">
+
+                    <input type="hidden" name="id" th:field="*{id}" />
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Nombre <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Dirección <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="direccion" th:field="*{direccion}" th:errorclass="is-invalid" />
+                            <small th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Descripción <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="direccion" th:field="*{direccion}" rows="4" th:errorclass="is-invalid"></textarea>
+                            <small th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="latitud" class="col-sm-2 col-form-label">Coordenadas <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-text">Lat</span>
+                                <input type="text" class="form-control" id="latitud" th:field="*{latitud}" th:errorclass="is-invalid" />
+                                <span class="input-group-text">Lon</span>
+                                <input type="text" class="form-control" id="longitud" th:field="*{longitud}" th:errorclass="is-invalid" />
+                            </div>
+                            <small th:if="${#fields.hasErrors('latitud')} or ${#fields.hasErrors('longitud')}"
+                                th:text="${#fields.hasErrors('latitud')
+                                    ? #strings.listJoin(#fields.errors('latitud'), ', ')
+                                    : #strings.listJoin(#fields.errors('longitud'), ', ')}"
+                                class="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="login" class="col-sm-2 col-form-label">Tarifa Base <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="tarifaBase" th:field="*{tarifaBase}" rows="4" th:errorclass="is-invalid"/>
+                            <small th:if="${#fields.hasErrors('tarifaBase')}" th:errors="*{tarifaBase}" th:errorclass="text-danger"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="foto" class="col-sm-2 col-form-label">Foto</label>
+                        <div class="col-sm-10">
+                            <input type="file" class="form-control" id="foto" name="foto" />
+                            <small class="text-muted">Sube una imagen del alojamiento.</small>
+                        </div>
+                    </div>
+
+                    <div th:if="${alojamiento.foto != null}" class="my-4 text-center">
+                        <img th:src="${alojamiento.foto}" class="img-fluid" alt="Foto del alojamiento" style="max-height:300px;">
+                    </div>
+
+                    <hr class="my-4" />
+            
+                    <div class="my-4 text-end">
+                        <button type="submit" class="btn btn-success ms-2">Guardar</button>
+                        <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/alojamientos/lista}">Cerrar</a>
+                    </div>
+
+                </form>
+
+            </section>
+            
+        </div>
+
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+        
+</body>
+</html>

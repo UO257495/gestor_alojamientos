@@ -87,6 +87,18 @@
 			<artifactId>passay</artifactId>
 			<version>1.6.6</version>
 		</dependency>
+		 <!-- AWS SDK for S3 -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.12.260</version>
+		</dependency>
+		<!-- Libreria .env -->
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>dotenv-java</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

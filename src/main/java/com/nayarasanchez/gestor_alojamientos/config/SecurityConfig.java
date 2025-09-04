@@ -46,7 +46,7 @@ public class SecurityConfig {
 
           http.formLogin(login -> login
             .loginPage("/auth/login")
-            .defaultSuccessUrl("/gestion/usuarios/lista", true)
+            .defaultSuccessUrl("/inicio", true)
             .usernameParameter("email") 
             .passwordParameter("password")
             .permitAll()
@@ -62,6 +62,9 @@ public class SecurityConfig {
             .requestMatchers("/fontawesome/**").permitAll()
             .requestMatchers("/js/**").permitAll()
             .requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/gestion/usuarios/detalle").permitAll()
+            .requestMatchers("/gestion/usuarios/nuevo").permitAll()
+            .requestMatchers("/gestion/usuarios/lista").permitAll()
             .anyRequest().authenticated()
         );
 

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Buscador de alojamientos')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido">
+
+        <h1 class="mb-4"> Buscador de alojamientos </h1>
+
+        <!-- FORMULARIO DE BÚSQUEDA -->
+        <form th:action="@{/buscar}" method="get" class="mb-3">
+            <input type="text" name="ubicacion" placeholder="Ubicación" />
+            <input type="number" name="personas" placeholder="Personas" />
+            <input type="date" name="fechaInicio" />
+            <input type="date" name="fechaFin" />
+            <button type="submit">Buscar</button>
+        </form>
+
+        <!-- MAPA -->
+        <div id="map"></div>
+
+        <!-- LISTADO -->
+
+    </section>
+
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
+    <script>
+        // Inicializar mapa
+        const map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+            source: new ol.source.OSM()
+            })
+        ],
+        view: new ol.View({
+            center: ol.proj.fromLonLat([-5.85, 43.36]), // Centro de Asturias
+            zoom: 9
+        })
+        });
+
+        // Capa vectorial para puntos de resultados
+        // const vectorSource = new ol.source.Vector();
+        // const vectorLayer = new ol.layer.Vector({ source: vectorSource });
+        // map.addLayer(vectorLayer);
+
+        // Manejar formulario de búsqueda
+        // document.getElementById("busquedaForm").addEventListener("submit", function(e) {
+        // e.preventDefault();
+        // const nombre = document.getElementById("nombre").value;
+
+        // Ejemplo estático de resultados (puedes cambiarlo por tu API)
+        // const resultados = [
+        //     { nombre: "Punto A", coords: [-3.7038, 40.4168] },
+        //     { nombre: "Punto B", coords: [-0.3763, 39.4699] }
+        // ];
+
+        // Limpiar resultados anteriores
+        // document.getElementById("resultados").innerHTML = "";
+        // vectorSource.clear();
+
+        // // Añadir resultados al listado y al mapa
+        // resultados.forEach(r => {
+        //     // Añadir al listado
+        //     const fila = `<tr>
+        //     <td>${r.nombre}</td>
+        //     <td>${r.coords.join(", ")}</td>
+        //     </tr>`;
+        //     document.getElementById("resultados").insertAdjacentHTML("beforeend", fila);
+
+        //     // Añadir marcador en el mapa
+        //     const feature = new ol.Feature({
+        //     geometry: new ol.geom.Point(ol.proj.fromLonLat(r.coords)),
+        //     name: r.nombre
+        //     });
+        //     vectorSource.addFeature(feature);
+        // });
+
+        // // Ajustar vista del mapa a los resultados
+        // if (resultados.length > 0) {
+        //     const extent = vectorSource.getExtent();
+        //     map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 12 });
+        // }
+        // });
+    </script>
+
+</body>
+</html>
