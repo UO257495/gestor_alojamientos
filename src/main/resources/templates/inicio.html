@@ -11,15 +11,20 @@
 
         <h1 class="mb-4"> Buscador de alojamientos </h1>
 
-        <!-- FORMULARIO DE BÚSQUEDA -->
-        <form th:action="@{/buscar}" method="get" class="mb-3">
-            <input type="text" name="ubicacion" placeholder="Ubicación" />
-            <input type="number" name="personas" placeholder="Personas" />
-            <input type="date" name="fechaInicio" />
-            <input type="date" name="fechaFin" />
-            <button type="submit">Buscar</button>
-        </form>
+         <div class="tab-content">
 
+            <section class="container my-3">
+
+                <!-- FORMULARIO DE BÚSQUEDA -->
+                <form th:action="@{/buscar}" method="get" class="mb-3">
+                    <input type="text" name="ubicacion" placeholder="Ubicación" />
+                    <input type="number" name="personas" placeholder="Personas" />
+                    <input type="date" name="fechaInicio" />
+                    <input type="date" name="fechaFin" />
+                    <button type="submit">Buscar</button>
+                </form>
+            </section>
+         </div>
         <!-- MAPA -->
         <div id="map"></div>
 

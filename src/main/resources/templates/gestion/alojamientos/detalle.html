@@ -43,8 +43,8 @@
                     <div class="mb-3 row">
                         <label for="login" class="col-sm-2 col-form-label">Descripción <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <textarea class="form-control" id="direccion" th:field="*{direccion}" rows="4" th:errorclass="is-invalid"></textarea>
-                            <small th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" th:errorclass="text-danger"></small>
+                            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="4" th:errorclass="is-invalid"></textarea>
+                            <small th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" th:errorclass="text-danger"></small>
                         </div>
                     </div>
 
@@ -76,13 +76,22 @@
                     <div class="mb-3 row">
                         <label for="foto" class="col-sm-2 col-form-label">Foto</label>
                         <div class="col-sm-10">
-                            <input type="file" class="form-control" id="foto" name="foto" />
+                            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" onchange="previewImage(event)" />
                             <small class="text-muted">Sube una imagen del alojamiento.</small>
                         </div>
                     </div>
 
-                    <div th:if="${alojamiento.foto != null}" class="my-4 text-center">
-                        <img th:src="${alojamiento.foto}" class="img-fluid" alt="Foto del alojamiento" style="max-height:300px;">
+                    <div class="my-4 d-flex justify-content-center">
+                         <img id="preview"
+                            class="img-fluid"
+                            alt="Previsualización de la foto"
+                            th:if="${alojamiento.foto != null}"
+                            th:attr="src=${alojamiento.foto}"
+                            style="max-height:300px;" />
+
+                        <img id="preview" class="img-fluid" alt="Previsualización de la foto"
+                            th:if="${alojamiento.foto == null}"
+                            style="max-height:300px; display:none;" />
                     </div>
 
                     <hr class="my-4" />
@@ -102,6 +111,24 @@
 
     <div th:replace="~{fragments/menu :: pie}"></div>
 
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('preview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;   // Asigna la imagen seleccionada
+                    preview.style.display = 'block'; // La hace visible
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none'; // Oculta si no hay archivo
+            }
+        }
+    </script>
         
 </body>
 </html>

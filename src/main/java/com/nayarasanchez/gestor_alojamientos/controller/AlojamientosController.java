@@ -62,12 +62,22 @@ public class AlojamientosController {
             return "gestion/alojamientos/detalle";
         }
 
-        Alojamiento alojamiento = new Alojamiento();
+         Alojamiento alojamiento;
+
+        if (alojamientoForm.getId() != null) {
+            alojamiento = alojamientoRepository.findById(alojamientoForm.getId())
+                                            .orElse(new Alojamiento());
+        } else {
+            alojamiento = new Alojamiento();
+        }
+
+        alojamiento = new Alojamiento();
         alojamiento.setNombre(alojamientoForm.getNombre());
         alojamiento.setDescripcion(alojamientoForm.getDescripcion());
         alojamiento.setDireccion(alojamientoForm.getDireccion());
         alojamiento.setLatitud(alojamientoForm.getLatitud());
         alojamiento.setLongitud(alojamientoForm.getLongitud());
+        alojamiento.setTarifaBase(alojamientoForm.getTarifaBase());
         alojamiento.setPropietario(null);
 
         // Subir foto a S3
