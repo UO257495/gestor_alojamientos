@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.AlojamientoForm;
+import com.nayarasanchez.gestor_alojamientos.dto.form.BusquedaAlojamientoForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.repository.AlojamientoRepository;
 
@@ -67,6 +68,14 @@ public class AlojamientoService {
 
         // Guardar en base de datos
         return alojamientoRepository.save(alojamiento);
+    }
+
+    public List<Alojamiento> buscar(BusquedaAlojamientoForm form) {
+        // Por ahora, ejemplo simple: filtrar por nombre si se indica
+        if (form.getNombre() != null && !form.getNombre().isBlank()) {
+            return alojamientoRepository.findByNombreContainingIgnoreCase(form.getNombre());
+        }
+        return alojamientoRepository.findAll();
     }
 
 }

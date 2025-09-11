@@ -1,5 +1,6 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.AlojamientoForm;
+import com.nayarasanchez.gestor_alojamientos.dto.form.BusquedaAlojamientoForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 
@@ -57,5 +59,12 @@ public class AlojamientosController {
         }
     }
 
+
+    @GetMapping("/buscar")
+    public String buscar(@ModelAttribute("busquedaForm") BusquedaAlojamientoForm form, Model model) {
+        List<Alojamiento> alojamientos = alojamientoService.buscar(form);
+        model.addAttribute("alojamientos", alojamientos);
+        return "gestion/alojamientos/busqueda";
+    }
     
 }

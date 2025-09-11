@@ -9,19 +9,54 @@
 
     <section class="container contenido">
 
-        <h1 class="mb-4"> Buscador de alojamientos </h1>
+        <h1 class="mb-4">
+            <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+            Buscador de alojamientos
+        </h1>
 
          <div class="tab-content">
 
             <section class="container my-3">
 
                 <!-- FORMULARIO DE BÚSQUEDA -->
-                <form th:action="@{/buscar}" method="get" class="mb-3">
-                    <input type="text" name="ubicacion" placeholder="Ubicación" />
-                    <input type="number" name="personas" placeholder="Personas" />
-                    <input type="date" name="fechaInicio" />
-                    <input type="date" name="fechaFin" />
-                    <button type="submit">Buscar</button>
+                <form th:action="@{/gestion/alojamientos/buscar}" th:object="${busquedaForm}" method="get" id="busquedaForm" class="mb-4">
+
+                    <div class="mb-3 row">
+                        <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" placeholder="Ej: Casa Rural El Bosque" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="ubicacion" class="col-sm-2 col-form-label">Ubicación</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="ubicacion" th:field="*{ubicacion}" placeholder="Ej: Asturias" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label for="personas" class="col-sm-2 col-form-label">Personas</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="personas" th:field="*{personas}" min="1" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Fechas</label>
+                        <div class="col-sm-5">
+                            <input type="date" class="form-control" id="fechaInicio" th:field="*{fechaInicio}" />
+                        </div>
+                        <div class="col-sm-5">
+                            <input type="date" class="form-control" id="fechaFin" th:field="*{fechaFin}" />
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-search"></i> Buscar
+                        </button>
+                    </div>
                 </form>
             </section>
          </div>
