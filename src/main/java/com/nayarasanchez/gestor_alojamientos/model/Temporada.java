@@ -21,6 +21,9 @@ public class Temporada {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false, length = 100)
+    private String nombre; 
+
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;
 
