@@ -49,5 +49,7 @@ public class Reserva {
     @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
     private Valoracion valoracion;
 
+    @Column(name = "precio_total", nullable = false)
+    private Double precioTotal = 0.0;
     
 }

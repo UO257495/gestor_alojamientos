@@ -18,6 +18,11 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
+					<div>
+						<li class="nav-item">
+						<a class="nav-link" th:href="@{/inicio}"><i class="fa-solid fa-house"></i> Inicio</a>
+					</li>
+					</div>
 					<div >
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -37,6 +42,16 @@
 								<li>
 									<a class="dropdown-item" th:href="@{/gestion/temporadas/lista}">
 										<i class="fa-solid fa-calendar-days"></i> Temporadas
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" th:href="@{/gestion/reservas/lista}">
+										<i class="fa-solid fa-list-check"></i> Reservas
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" th:href="@{/gestion/reservas/lista}">
+										<i class="fa-solid fa-chart-bar"></i> Estadísticas
 									</a>
 								</li>
 							</ul>

@@ -38,7 +38,7 @@ public class TemporadaService {
             temporada = new Temporada();
         }
 
-        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId())
+        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamiento())
                 .orElseThrow(() -> new IllegalArgumentException("Alojamiento no encontrado"));
 
         boolean existeSolapamiento = temporadaRepository

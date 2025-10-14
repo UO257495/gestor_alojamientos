@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.TemporadaForm;
+import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
 import com.nayarasanchez.gestor_alojamientos.model.Temporada;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.TemporadaService;
@@ -47,17 +49,21 @@ public class GestionTemporadasController {
     
     @PostMapping("/nuevo")
     public String nuevo(@Valid @ModelAttribute("temporada") TemporadaForm temporadaForm,
-                        BindingResult result, Model model) {
+                        BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             model.addAttribute("alojamientos", alojamientoService.listarTodos());
             return "gestion/temporadas/detalle";
         }
         
-        Temporada temporada = temporadaService.crearOActualizar(temporadaForm);
-        
-        return "redirect:/gestion/temporadas/detalle?id=" + temporada.getId();
-    
+         try {
+            temporadaService.crearOActualizar(temporadaForm);
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto("Temporada guardada correctamente"));
+            return "redirect:/gestion/temporadas/lista";
+         } catch (Exception e) {
+            model.addAttribute("mensajeUsuario", "Error guardando el alojamiento");
+            return "gestion/alojamientos/detalle";
+        }
     }
 
     @GetMapping("/eliminar")

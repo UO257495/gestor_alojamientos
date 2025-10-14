@@ -4,13 +4,14 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
+
 import lombok.Data;
 
 @Data
-public class TemporadaForm {
+public class ReservaForm {
+    
     private Long id;
-
-    private String nombre;
 
     @DateTimeFormat(pattern = "dd/MM/yyyy") 
     private LocalDate fechaInicio;
@@ -18,7 +19,13 @@ public class TemporadaForm {
     @DateTimeFormat(pattern = "dd/MM/yyyy") 
     private LocalDate fechaFin;
 
-    private Double precio;
-    
-    private Long alojamiento;
+    private int numeroPersonas;
+
+    private EstadoReserva estado;
+
+    private Long clienteId;
+
+    private Long alojamientoId;
+
+    private Double total; //Total calculado de precio de tarifa base del alojamiento + incremento de la temporada
 }
