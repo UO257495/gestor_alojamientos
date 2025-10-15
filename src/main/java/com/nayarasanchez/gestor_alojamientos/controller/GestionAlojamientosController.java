@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/gestion/alojamientos")
-public class AlojamientosController {
+public class GestionAlojamientosController {
     
     private final AlojamientoService alojamientoService;
 
@@ -66,5 +66,11 @@ public class AlojamientosController {
         model.addAttribute("alojamientos", alojamientos);
         return "gestion/alojamientos/busqueda";
     }
-    
+
+    @GetMapping("/eliminar")
+    public String eliminar(@RequestParam("id") Long id) {
+        alojamientoService.eliminar(id);
+        return "redirect:lista";
+    }
+        
 }

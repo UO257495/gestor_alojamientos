@@ -13,8 +13,10 @@ import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.repository.AlojamientoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AlojamientoService {
 
@@ -57,6 +59,7 @@ public class AlojamientoService {
         alojamiento.setLongitud(form.getLongitud());
         alojamiento.setTarifaBase(form.getTarifaBase());
         alojamiento.setPropietario(null);
+        alojamiento.setCapacidad(form.getCapacidad());
         //TODO: ASIGNAR EL PROPIETARIO REAL
 
         // Subir foto a S3 si se ha cargado
@@ -78,4 +81,20 @@ public class AlojamientoService {
         return alojamientoRepository.findAll();
     }
 
+    public void eliminar(Long id) {
+        alojamientoRepository.findById(id).ifPresent(alojamiento -> {
+            // Eliminar la imagen de S3 si existe
+            if (alojamiento.getFoto() != null && !alojamiento.getFoto().isBlank()) {
+                try {
+                    s3Service.deleteFile(alojamiento.getFoto());
+                } catch (Exception e) {
+                    // Loguear error, pero no impedir la eliminación del registro
+                    log.error("Error al eliminar la foto de S3: " + alojamiento.getFoto(), e);
+                }
+            }
+
+            // Eliminar registro de la base de datos
+            alojamientoRepository.delete(alojamiento);
+        });
+    }
 }

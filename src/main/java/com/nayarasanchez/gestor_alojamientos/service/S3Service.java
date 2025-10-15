@@ -1,14 +1,13 @@
 package com.nayarasanchez.gestor_alojamientos.service;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -39,4 +38,20 @@ public class S3Service {
     public S3Object downloadFile(String fileName) {
         return amazonS3.getObject(bucketName, fileName);
     }
+
+    /**
+     * Elimina un archivo de S3 a partir de su URL.
+     */
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) return;
+
+        String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+        try {
+            amazonS3.deleteObject(bucketName, key);
+        } catch (Exception e) {
+            System.err.println("Error eliminando archivo de S3: " + e.getMessage());
+        }
+    }
+
 }

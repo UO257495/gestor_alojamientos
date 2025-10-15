@@ -1,7 +1,9 @@
 package com.nayarasanchez.gestor_alojamientos.repository;
 
+import com.nayarasanchez.gestor_alojamientos.model.Rol;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +18,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
     public Optional<Usuario> buscarUsuarioPorEmail(String email);
 
     public Optional<Usuario> findByEmail(String email);
+
+    public List<Usuario> findAllByRol(Rol cliente);
 }

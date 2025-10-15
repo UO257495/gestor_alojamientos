@@ -32,6 +32,9 @@ public class Alojamiento {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
+    @Column(nullable = false)
+    private Integer capacidad;
+
     @Column(length = 1000)
     private String foto; 
     

@@ -35,5 +35,8 @@ public class AlojamientoForm {
     @NotNull(message = "{validation.obligatorio}")
     private Double longitud; 
 
+    @NotNull(message = "{validation.obligatorio}")
+    private Integer capacidad; 
+
 
 }

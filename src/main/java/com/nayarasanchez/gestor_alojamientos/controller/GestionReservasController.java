@@ -18,7 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
+import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
+import com.nayarasanchez.gestor_alojamientos.service.UsuarioService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class GestionReservasController {
     
     private final ReservaService reservaService;
+    private final AlojamientoService alojamientoService;
+    private final UsuarioService usuarioService;
     
 
     @GetMapping("/lista")
@@ -39,12 +43,13 @@ public class GestionReservasController {
 
     @GetMapping("/detalle")
     public String detalle(@RequestParam("id") Optional<Long> id, Model model) {
-        Reserva temporada = id
+        Reserva reserva = id
                 .flatMap(reservaService::buscarPorId)
                 .orElse(new Reserva());
 
-        model.addAttribute("temporada", temporada);
-        model.addAttribute("alojamientos", reservaService.listarTodas());
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("clientes", usuarioService.listarClientes());
+        model.addAttribute("alojamientos", alojamientoService.listarTodos());
         return "gestion/reservas/detalle";
     }
     

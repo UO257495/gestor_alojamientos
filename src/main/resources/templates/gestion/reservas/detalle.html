@@ -27,7 +27,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Cliente <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <select id="clienteSelect" class="form-select" th:field="*{clienteId}">
+                            <select id="clienteSelect" class="form-select" th:field="*{cliente}">
                                 <option value="">Seleccione un cliente...</option>
                                 <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombre}"></option>
                             </select>
@@ -37,7 +37,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Alojamiento <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <select id="alojamientoSelect" class="form-select" th:field="*{alojamientoId}">
+                            <select id="alojamientoSelect" class="form-select" th:field="*{alojamiento}">
                                 <option value="">Seleccione alojamiento...</option>
                                 <option th:each="a : ${alojamientos}" th:value="${a.id}" th:text="${a.nombre}"></option>
                             </select>
@@ -81,7 +81,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Total (€)</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" th:field="*{total}" id="totalInput" readonly/>
+                            <input type="text" class="form-control" th:field="*{precioTotal}" id="totalInput" readonly/>
                         </div>
                     </div>
 
@@ -105,7 +105,7 @@
 
 	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
 
-    <script type="module" th:src="@{/js/gestion/reservas/reservas.js}"></script>
+    <script type="module" th:src="@{/js/gestion/reservas/detalle.js}"></script>
 
     
 </body>
