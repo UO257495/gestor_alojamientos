@@ -31,9 +31,6 @@ public class Reserva {
     @Column(name = "fecha_fin", nullable = false)
     private LocalDate fechaFin;
 
-    @Column(name = "numero_personas", nullable = false)
-    private int numeroPersonas;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoReserva estado;

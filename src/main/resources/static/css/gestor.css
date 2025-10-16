@@ -11,3 +11,8 @@
     border: 1px solid #ccc;
     margin-bottom: 20px;
   }
+
+.fecha-ocupada {
+    background-color: red !important;
+    color: white !important;
+}

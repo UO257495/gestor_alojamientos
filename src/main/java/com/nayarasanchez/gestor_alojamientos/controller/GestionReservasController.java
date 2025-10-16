@@ -1,6 +1,8 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,7 +61,8 @@ public class GestionReservasController {
                         BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-            model.addAttribute("alojamientos", reservaService.listarTodas());
+            model.addAttribute("clientes", usuarioService.listarClientes());
+            model.addAttribute("alojamientos", alojamientoService.listarTodos());
             return "gestion/reservas/detalle";
         }
         
@@ -67,8 +71,8 @@ public class GestionReservasController {
             redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto("Reserva creada correctamente"));
             return "redirect:/gestion/reservas/lista";
          } catch (Exception e) {
-            model.addAttribute("mensajeUsuario", "Error creando la reserva");
-            return "gestion/alojamientos/detalle";
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Error creando la reserva"));
+            return "gestion/reservas/detalle";
         }
     }
 
@@ -84,6 +88,17 @@ public class GestionReservasController {
                                 @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate inicio,
                                 @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fin) {
         return reservaService.calcularTotal(alojamientoId, inicio, fin);
+    }
+
+    @GetMapping("/gestion/alojamientos/{id}/fechas-ocupadas")
+    @ResponseBody
+    public List<Map<String, String>> obtenerFechasOcupadas(@PathVariable Long id) {
+        return reservaService.findByAlojamientoId(id).stream()
+            .map(r -> Map.of(
+                "inicio", r.getFechaInicio().toString(),
+                "fin", r.getFechaFin().toString()
+            ))
+            .toList();
     }
 
 }

@@ -2,6 +2,7 @@ package com.nayarasanchez.gestor_alojamientos.service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.repository.AlojamientoRepository;
@@ -52,13 +54,12 @@ public class ReservaService {
 
         reserva.setFechaInicio(form.getFechaInicio());
         reserva.setFechaFin(form.getFechaFin());
-        reserva.setNumeroPersonas(form.getNumeroPersonas());
-        reserva.setEstado(form.getEstado());
+        reserva.setEstado(EstadoReserva.PENDIENTE);
 
-        Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
+        Usuario cliente = usuarioRepository.findById(form.getCliente()).orElseThrow();
         reserva.setCliente(cliente);
 
-        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
+        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamiento()).orElseThrow();
         reserva.setAlojamiento(alojamiento);
 
         // 💰 Calcular precio total (simplificado)
@@ -102,5 +103,10 @@ public class ReservaService {
 
         return (precioBase + precioTemporada) * dias;
     }
+
+    public Collection<Reserva> findByAlojamientoId(Long id) {
+        return reservaRepository.findByAlojamientoId(id);
+    }
+
 }
 

@@ -11,7 +11,8 @@
 
         <h1> 
 			<i class="fa-solid fa-calendar-days text-secondary"></i> Reserva 
-			<small th:if="${reserva.id != null}" class="text-secondary" th:text="${reserva.cliente.nombre}"></small> 
+			<small th:if="${reserva != null and reserva.id != null and reserva.cliente != null}" class="text-secondary" th:text="${reserva.cliente.nombre}"></small>
+ 
 		</h1>
 
         <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
@@ -46,7 +47,7 @@
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Fecha Inicio <span class="text-danger">*</span></label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-4">
                             <div id="fechaInicio" class="input-group" data-td-target-input="nearest" data-td-target-toggle="nearest">
                                     <input id="fechaInicioInput" name="fechaInicio" th:field="*{fechaInicio}" type="text" class="form-control" data-td-target="#fechaInicio"/>
                                     <span class="input-group-text" data-td-target="#fechaInicio" data-td-toggle="datetimepicker">
@@ -59,7 +60,7 @@
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Fecha Fin <span class="text-danger">*</span></label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-4">
                             <div id="fechaFin" class="input-group" data-td-target-input="nearest" data-td-target-toggle="nearest">
                                     <input id="fechaFinInput" name="fechaFin" th:field="*{fechaFin}" type="text" class="form-control" data-td-target="#fechaFin" />
                                     <span class="input-group-text" data-td-target="#fechaFin" data-td-toggle="datetimepicker">
@@ -72,13 +73,6 @@
 
 
                     <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Personas</label>
-                        <div class="col-sm-4">
-                            <input type="number" min="1" class="form-control" th:field="*{numeroPersonas}"/>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Total (€)</label>
                         <div class="col-sm-4">
                             <input type="text" class="form-control" th:field="*{precioTotal}" id="totalInput" readonly/>
@@ -89,7 +83,7 @@
             
                     <div class="my-4 text-end">
                         <button type="submit" class="btn btn-success ms-2">Guardar</button>
-                        <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/usuarios/lista}">Cerrar</a>
+                        <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/reservas/lista}">Cerrar</a>
                     </div>
                     
                 </form>
