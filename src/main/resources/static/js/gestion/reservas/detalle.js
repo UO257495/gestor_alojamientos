@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alojamientoSelect = document.getElementById("alojamientoSelect");
     const totalInput = document.getElementById("totalInput");
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
 
     let fechasOcupadas = []; // lista de intervalos ocupados
 
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechasBloqueadas = fechasOcupadas.flatMap(rango => {
             const lista = [];
             let fecha = new Date(rango.inicio);
-            while (fecha <= rango.fin) {
+            while (fecha < rango.fin) {
                 if (fecha >= hoy) lista.push(new Date(fecha));
                 fecha.setDate(fecha.getDate() + 1);
             }
@@ -93,88 +94,78 @@ document.addEventListener('DOMContentLoaded', function() {
         //-------------------------------
         // Actualizar fecha fin
         //-------------------------------
-        let fechaMinFin = hoy;
-        let fechasDisponiblesFin = [];
 
         if (fechaInicioInput.value) {
             const partes = fechaInicioInput.value.split('/');
-            const fechaInicioSeleccionada = new Date(partes[2], partes[1]-1, partes[0]);
-            fechaMinFin = new Date(fechaInicioSeleccionada.getTime() + 24*60*60*1000);
+            const fechaInicioSeleccionada = new Date(partes[2], partes[1] - 1, partes[0]);
+            
+            // 1. La fecha mínima de check-out es 1 día después del check-in
+            const fechaMinFin = new Date(fechaInicioSeleccionada.getTime() + 24 * 60 * 60 * 1000);
 
-            // Calcular fechas consecutivas disponibles desde fechaMinFin
-            let fecha = new Date(fechaMinFin);
-            const limite = new Date(hoy.getFullYear() + 10, hoy.getMonth(), hoy.getDate()); // 10 años adelante
+            // 2. Encontrar la *próxima* fecha de check-in bloqueada *después* de nuestro check-in
+            let proximaFechaBloqueada = null;
+            
+            // Ordenamos las fechas bloqueadas para encontrar la más cercana
+            const fechasBloqueadasOrdenadas = fechasBloqueadas
+                .map(d => d.getTime())
+                .sort((a, b) => a - b);
 
-            while (!esFechaOcupada(fecha) && fecha <= limite) {
-                fechasDisponiblesFin.push(new Date(fecha));
-                fecha.setDate(fecha.getDate() + 1);
-            }
-
-            // Generar todas las fechas posteriores a la última consecutiva para bloquearlas
-            const fechasPosterioresBloqueadas = [];
-            if (fechasDisponiblesFin.length) {
-                let f = new Date(fechasDisponiblesFin[fechasDisponiblesFin.length - 1].getTime() + 24*60*60*1000);
-                const limitePosterior = new Date(hoy.getFullYear() + 10, hoy.getMonth(), hoy.getDate()); //10 años
-                while (f <= limitePosterior) {
-                    fechasPosterioresBloqueadas.push(new Date(f));
-                    f.setDate(f.getDate() + 1);
+            for (const fechaTimestamp of fechasBloqueadasOrdenadas) {
+                // (Ignoramos el setTime(0,0,0,0) por simplicidad, JS lo maneja)
+                if (fechaTimestamp > fechaInicioSeleccionada.getTime()) {
+                    proximaFechaBloqueada = new Date(fechaTimestamp);
+                    break;
                 }
             }
 
+            // 3. Deshabilitar todas las fechas *posteriores* a esa próxima reserva
+            // El usuario SÍ puede hacer check-out el mismo día que otro hace check-in
+            let fechasDeshabilitadasFin = [];
+            if (proximaFechaBloqueada) {
+                // Empezamos a deshabilitar el día *siguiente* al inicio de la próxima reserva
+                let fecha = new Date(proximaFechaBloqueada.getTime() + 24 * 60 * 60 * 1000);
+                const limite = new Date(hoy.getFullYear() + 10, hoy.getMonth(), hoy.getDate());
+
+                while (fecha <= limite) {
+                    fechasDeshabilitadasFin.push(new Date(fecha));
+                    fecha.setDate(fecha.getDate() + 1);
+                }
+            }
+            
             tdFechaFin.updateOptions({
                 restrictions: {
                     minDate: fechaMinFin,
-                    disabledDates: fechasBloqueadas.concat(fechasPosterioresBloqueadas)
+                    disabledDates: fechasDeshabilitadasFin // Solo deshabilitamos las fechas futuras
                 }
             });
 
-            //-------------------------------
-            // Función para marcar fechas ocupadas en rojo
-            //-------------------------------
-            function formatDate(d) {
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${y}-${m}-${day}`;
-            }
-
-            function marcarFechasOcupadas(tdInstance) {
-                tdInstance._calendar?.querySelectorAll('td').forEach(tdCell => {
-                    const dataDate = tdCell.getAttribute('data-date');
-                    if (!dataDate) return;
-
-                    const cellDate = new Date(dataDate);
-                    const cellStr = formatDate(cellDate);
-
-                    const ocupada = fechasOcupadas.some(rango => {
-                        let f = new Date(rango.inicio);
-                        while (f <= rango.fin) {
-                            if (formatDate(f) === cellStr) return true;
-                            f.setDate(f.getDate() + 1);
-                        }
-                        return false;
-                    });
-
-                    if (ocupada) tdCell.classList.add('fecha-ocupada');
-                });
-            }
-
-            // Suscribir el marcado de fechas ocupadas a eventos de renderizado
-            [tdFechaInicio, tdFechaFin].forEach(td => {
-                td.subscribe('update.td', () => marcarFechasOcupadas(td));
-                marcarFechasOcupadas(td); // también marcar inmediatamente
+        } else {
+            // Si no hay fecha de inicio, deshabilitamos todo lo que ya está bloqueado
+             tdFechaFin.updateOptions({
+                restrictions: {
+                    minDate: hoy,
+                    disabledDates: fechasBloqueadas
+                }
             });
         }
 
+            
         //-------------------------------
         // Marcar fechas ocupadas en rojo
-        //-------------------------------
+         //-------------------------------
         [tdFechaInicio, tdFechaFin].forEach(td => {
             td._calendar?.querySelectorAll('td').forEach(tdCell => {
                 const dataDate = tdCell.getAttribute('data-date');
                 if (dataDate) {
                     const d = new Date(dataDate);
-                    if (esFechaOcupada(d)) tdCell.classList.add('fecha-ocupada');
+                    
+                    // 1. Limpiamos la clase primero
+                    tdCell.classList.remove('fecha-ocupada'); 
+
+                    // 2. Si está ocupada, la volvemos a añadir
+                    if (esFechaOcupada(d)) {
+                        tdCell.classList.add('fecha-ocupada');
+                    }
                 }
             });
         });
@@ -229,5 +220,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     fechaFinInput.addEventListener("change", calcularTotal);
+
+
+    if (alojamientoSelect.value) {
+        fechaInicioInput.disabled = false;
+        fechaFinInput.disabled = false;
+        cargarFechasOcupadas(alojamientoSelect.value);
+    }
 
 });

@@ -1,6 +1,13 @@
 package com.nayarasanchez.gestor_alojamientos.model;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,7 +24,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "usuarios")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,9 +49,28 @@ public class Usuario {
     private String password;
 
     @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Alojamiento> alojamientos;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Reserva> reservas;
 
+    // -------------------------
+    // Métodos de UserDetails
+    // -------------------------
+    
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Convención de Spring Security: "ROLE_" + nombre del rol
+        return Collections.singleton(() -> "ROLE_" + rol.name());
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+
 }
+

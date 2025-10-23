@@ -11,8 +11,7 @@
 
         <h1> 
 			<i class="fa-solid fa-calendar-days text-secondary"></i> Reserva 
-			<small th:if="${reserva != null and reserva.id != null and reserva.cliente != null}" class="text-secondary" th:text="${reserva.cliente.nombre}"></small>
- 
+			<small th:if="${reserva != null and reserva.id != null}" class="text-secondary"  th:text="${clienteNombre}"></small>
 		</h1>
 
         <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
@@ -21,16 +20,20 @@
 
             <section class="container my-3">
                 
-                <form th:action="${reserva.id == null} ? 'nuevo' : 'editar'" method="post" th:object="${reserva}">
+                <form th:action="@{${reserva.id} != null ? '/gestion/reservas/editar' : '/gestion/reservas/nuevo'}" method="post" th:object="${reserva}">
 
                     <input type="hidden" name="id" th:field="*{id}" />
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Cliente <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <select id="clienteSelect" class="form-select" th:field="*{cliente}">
+                            <select id="clienteSelect" class="form-select" th:field="*{clienteId}">
                                 <option value="">Seleccione un cliente...</option>
-                                <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                                <option th:each="c : ${clientes}" 
+                                        th:value="${c.id}" 
+                                        th:text="${c.nombre}" 
+                                        th:selected="${reserva.clienteId != null and reserva.clienteId == c.id}">
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -38,9 +41,13 @@
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Alojamiento <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <select id="alojamientoSelect" class="form-select" th:field="*{alojamiento}">
+                            <select id="alojamientoSelect" class="form-select" th:field="*{alojamientoId}">
                                 <option value="">Seleccione alojamiento...</option>
-                                <option th:each="a : ${alojamientos}" th:value="${a.id}" th:text="${a.nombre}"></option>
+                                <option th:each="a : ${alojamientos}" 
+                                        th:value="${a.id}" 
+                                        th:text="${a.nombre}" 
+                                        th:selected="${reserva.alojamientoId != null and reserva.alojamientoId == a.id}">
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -71,6 +78,39 @@
                         </div>
                     </div>
 
+                    <!-- Solo para creación.  -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')') and reserva.id == null}">
+                        <label class="col-sm-2 col-form-label">Estado</label>
+                        <div class="col-sm-4">
+                            <select th:field="*{estado}" class="form-select">
+                                <option th:value="${T(com.nayarasanchez.gestor_alojamientos.model.EstadoReserva).PENDIENTE}"
+                                        th:text="PENDIENTE"></option>
+                                <option th:value="${T(com.nayarasanchez.gestor_alojamientos.model.EstadoReserva).CONFIRMADA}"
+                                        th:text="CONFIRMADA"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Solo para edición. Solo editable para propietarios o administradores.  -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')') and reserva.id != null }">
+                        <label class="col-sm-2 col-form-label">Estado</label>
+                        <div class="col-sm-4">
+                            <select th:field="*{estado}" class="form-select">
+                                <option th:each="e : ${T(com.nayarasanchez.gestor_alojamientos.model.EstadoReserva).values()}"
+                                        th:value="${e}" 
+                                        th:text="${e}" >
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Solo lectura para clientes -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasRole(''PROPIETARIO'')')}">
+                        <label class="col-sm-2 col-form-label">Estado</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" th:value="${reserva.estado}" readonly />
+                        </div>
+                    </div>
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Total (€)</label>

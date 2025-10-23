@@ -5,6 +5,7 @@ public enum EstadoReserva {
     
     PENDIENTE ("PENDIENTE"),
     CONFIRMADA ("CONFIRMADA"),
+	RECHAZADA ("RECHAZADA"),
     CANCELADA ("CANCELADA");
 
     private final String valor;

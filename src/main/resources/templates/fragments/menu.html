@@ -46,7 +46,7 @@
 								</li>
 								<li>
 									<a class="dropdown-item" th:href="@{/gestion/reservas/lista}">
-										<i class="fa-solid fa-list-check"></i> Reservas
+										<i class="fa-solid fa-calendar-check"></i> Reservas
 									</a>
 								</li>
 								<li>
@@ -63,7 +63,16 @@
 							<i class="fa-regular fa-circle-user"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
-							
+							<li>
+								<a class="dropdown-item" th:href="@{/logout}">
+									<i class="fa-solid fa-user-circle"></i> Mi Perfil
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/logout}">
+									<i class="fa-solid fa-calendar-check"></i> Mis reservas
+								</a>
+							</li>
 							<li>
 								<a class="dropdown-item" th:href="@{/logout}">
 									<i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión

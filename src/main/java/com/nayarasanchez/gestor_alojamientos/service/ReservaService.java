@@ -54,23 +54,15 @@ public class ReservaService {
 
         reserva.setFechaInicio(form.getFechaInicio());
         reserva.setFechaFin(form.getFechaFin());
-        reserva.setEstado(EstadoReserva.PENDIENTE);
+        reserva.setEstado(form.getEstado());
 
-        Usuario cliente = usuarioRepository.findById(form.getCliente()).orElseThrow();
+        Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
         reserva.setCliente(cliente);
 
-        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamiento()).orElseThrow();
+        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
         reserva.setAlojamiento(alojamiento);
 
-        // 💰 Calcular precio total (simplificado)
-        double precioBase = alojamiento.getTarifaBase();
-        double precioTemporada = temporadaRepository.findPrecioPorFechasYAlojamiento(
-            form.getFechaInicio(), form.getFechaFin(), alojamiento.getId()
-        ).orElse(0.0);
-
-        long dias = ChronoUnit.DAYS.between(form.getFechaInicio(), form.getFechaFin());
-        double total = (precioBase + precioTemporada) * dias;
-        reserva.setPrecioTotal(total);
+        reserva.setPrecioTotal(form.getPrecioTotal());
 
         return reservaRepository.save(reserva);
     }
@@ -91,7 +83,7 @@ public class ReservaService {
         Alojamiento alojamiento = alojamientoRepository.findById(alojamientoId)
                 .orElseThrow(() -> new IllegalArgumentException("Alojamiento no encontrado"));
 
-        double precioBase = alojamiento.getTarifaBase(); // 💰 Campo en tu entidad Alojamiento
+        double precioBase = alojamiento.getTarifaBase(); 
 
         // Buscar la temporada activa en esas fechas
         Double precioTemporada = temporadaRepository
@@ -102,6 +94,13 @@ public class ReservaService {
         if (dias <= 0) dias = 1; // al menos 1 día
 
         return (precioBase + precioTemporada) * dias;
+    }
+
+    public List<Reserva> findFechasOcupadas(Long alojamientoId) {
+        return reservaRepository.findByAlojamientoIdAndEstadoNotIn(
+            alojamientoId,
+            List.of(EstadoReserva.CANCELADA, EstadoReserva.RECHAZADA)
+        );
     }
 
     public Collection<Reserva> findByAlojamientoId(Long id) {

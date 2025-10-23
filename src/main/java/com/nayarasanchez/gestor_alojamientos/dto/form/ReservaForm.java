@@ -23,9 +23,9 @@ public class ReservaForm {
 
     private EstadoReserva estado;
 
-    private Long cliente;
-
-    private Long alojamiento;
+    private Long clienteId;
+    
+    private Long alojamientoId;
 
     private Double precioTotal; //Total calculado de precio de tarifa base del alojamiento + incremento de la temporada
 }

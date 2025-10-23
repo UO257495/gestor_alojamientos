@@ -16,3 +16,8 @@
     background-color: red !important;
     color: white !important;
 }
+
+#tablaReservas td:not(:last-child),
+#tablaReservas th:not(:last-child) {
+    text-align: left !important;
+}

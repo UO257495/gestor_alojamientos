@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,7 +22,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
+import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
+import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
 import com.nayarasanchez.gestor_alojamientos.service.UsuarioService;
@@ -46,19 +51,43 @@ public class GestionReservasController {
 
     @GetMapping("/detalle")
     public String detalle(@RequestParam("id") Optional<Long> id, Model model) {
-        Reserva reserva = id
-                .flatMap(reservaService::buscarPorId)
-                .orElse(new Reserva());
+        Reserva reserva = id.flatMap(reservaService::buscarPorId).orElse(new Reserva());
 
-        model.addAttribute("reserva", reserva);
-        model.addAttribute("clientes", usuarioService.listarClientes());
-        model.addAttribute("alojamientos", alojamientoService.listarTodos());
+        ReservaForm form = new ReservaForm();
+        form.setId(reserva.getId());
+        form.setClienteId(reserva.getCliente() != null ? reserva.getCliente().getId() : null);
+        form.setAlojamientoId(reserva.getAlojamiento() != null ? reserva.getAlojamiento().getId() : null);
+        form.setFechaInicio(reserva.getFechaInicio());
+        form.setFechaFin(reserva.getFechaFin());
+        form.setPrecioTotal(reserva.getPrecioTotal());
+        form.setEstado(reserva.getEstado());
+
+        model.addAttribute("reserva", form);
+        List<Usuario> clientes = usuarioService.listarClientes();
+        List<Alojamiento> alojamientos = alojamientoService.listarTodos();
+        model.addAttribute("clientes", clientes);
+        model.addAttribute("alojamientos", alojamientos);
+
+        if (form.getClienteId() != null) {
+            clientes.stream()
+                    .filter(c -> c.getId().equals(form.getClienteId()))
+                    .findFirst()
+                    .ifPresent(c -> model.addAttribute("clienteNombre", c.getNombre()));
+        }
+
+        if (form.getAlojamientoId() != null) {
+            alojamientos.stream()
+                    .filter(a -> a.getId().equals(form.getAlojamientoId()))
+                    .findFirst()
+                    .ifPresent(a -> model.addAttribute("alojamientoNombre", a.getNombre()));
+        }
+
         return "gestion/reservas/detalle";
     }
     
     @PostMapping("/nuevo")
     public String nuevo(@Valid @ModelAttribute("reserva") ReservaForm reservaForm,
-                        BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+                        BindingResult result, Model model, RedirectAttributes redirectAttributes, @AuthenticationPrincipal Usuario usuarioActual) {
 
         if (result.hasErrors()) {
             model.addAttribute("clientes", usuarioService.listarClientes());
@@ -76,6 +105,32 @@ public class GestionReservasController {
         }
     }
 
+    @PostMapping("/editar")
+    public String editar(@Valid @ModelAttribute("reserva") ReservaForm reservaForm,
+                        BindingResult result, Model model,
+                        RedirectAttributes redirectAttributes,
+                        @AuthenticationPrincipal Usuario usuarioActual) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("clientes", usuarioService.listarClientes());
+            model.addAttribute("alojamientos", alojamientoService.listarTodos());
+            return "gestion/reservas/detalle";
+        }
+
+        try {
+            reservaService.crearOActualizar(reservaForm);
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto("Reserva actualizada correctamente"));
+            return "redirect:/gestion/reservas/lista";
+
+        } catch (Exception e) {
+             e.printStackTrace();
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Error actualizando la reserva"));
+            model.addAttribute("clientes", usuarioService.listarClientes());
+            model.addAttribute("alojamientos", alojamientoService.listarTodos());
+            return "gestion/reservas/detalle";
+        }
+    }
+    
     @GetMapping("/eliminar")
     public String eliminar(@RequestParam("id") Long id) {
         reservaService.eliminar(id);
@@ -93,12 +148,13 @@ public class GestionReservasController {
     @GetMapping("/gestion/alojamientos/{id}/fechas-ocupadas")
     @ResponseBody
     public List<Map<String, String>> obtenerFechasOcupadas(@PathVariable Long id) {
-        return reservaService.findByAlojamientoId(id).stream()
+        return reservaService.findFechasOcupadas(id).stream()
             .map(r -> Map.of(
                 "inicio", r.getFechaInicio().toString(),
                 "fin", r.getFechaFin().toString()
             ))
             .toList();
     }
+
 
 }

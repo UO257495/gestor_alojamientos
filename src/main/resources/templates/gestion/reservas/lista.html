@@ -33,7 +33,15 @@
                     <td th:text="${reserva.alojamiento.nombre}"></td>
                     <td th:text="${reserva.fechaInicio}"></td>
                     <td th:text="${reserva.fechaFin}"></td>
-                    <td th:text="${reserva.estado}"></td>
+                    <td>
+                        <span th:switch="${reserva.estado.toString()}">
+                            <span th:case="'PENDIENTE'" class="badge bg-dark text-white">PENDIENTE</span>
+                            <span th:case="'CANCELADA'" class="badge bg-danger">CANCELADA</span>
+                            <span th:case="'CONFIRMADA'" class="badge bg-success">CONFIRMADA</span>
+                            <span th:case="'RECHAZADA'" class="badge bg-warning text-dark">RECHAZADA</span>
+                            <span th:case="*"class="badge bg-light text-dark" th:text="${reserva.estado}">OTRO</span>
+                        </span>
+                    </td>
                     <td class="dt-right">
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-outline-primary" title="Editar" data-accion="editar" th:data-id="${reserva.id}"><i class="fa-solid fa-pen"></i></button>

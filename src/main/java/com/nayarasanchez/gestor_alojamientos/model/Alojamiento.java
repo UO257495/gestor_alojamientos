@@ -2,6 +2,8 @@ package com.nayarasanchez.gestor_alojamientos.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,9 +54,11 @@ public class Alojamiento {
     private Usuario propietario;
 
     @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL , orphanRemoval = true)
+    @JsonIgnore
     private List<Temporada> temporadas;
 
 }
