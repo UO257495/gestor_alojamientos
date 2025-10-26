@@ -42,10 +42,9 @@ public class SecurityConfig {
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable());
-        http.anonymous(anonymous -> anonymous.disable());
 
           http.formLogin(login -> login
-            .loginPage("/auth/login")
+            .loginPage("/login")
             .defaultSuccessUrl("/inicio", true)
             .usernameParameter("email") 
             .passwordParameter("password")
@@ -57,14 +56,11 @@ public class SecurityConfig {
 
         // Las reglas más específicas necesitan estar primero, seguidas por las más generales
         http.authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/css/**").permitAll()
-            .requestMatchers("/img/**").permitAll()
-            .requestMatchers("/fontawesome/**").permitAll()
-            .requestMatchers("/js/**").permitAll()
-            .requestMatchers("/auth/**").permitAll()
-            .requestMatchers("/gestion/usuarios/detalle").permitAll()
-            .requestMatchers("/gestion/usuarios/nuevo").permitAll()
-            .requestMatchers("/gestion/usuarios/lista").permitAll()
+            // Recursos públicos
+            .requestMatchers("/css/**", "/img/**", "/fontawesome/**", "/js/**").permitAll()
+            // Rutas accesibles sin sesión
+            .requestMatchers("/inicio", "/login", "/registro", "/auth/**","/gestion/usuarios/detalle", "/gestion/usuarios/nuevo").permitAll()
+            // Todo lo demás requiere autenticación
             .anyRequest().authenticated()
         );
 

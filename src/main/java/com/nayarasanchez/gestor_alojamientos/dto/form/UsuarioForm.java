@@ -15,7 +15,6 @@ public class UsuarioForm {
 
     private Long id;
 
-    @NotNull(message = "{validation.obligatorio}")
     private Rol rol;
 
     @NotBlank(message = "{validation.obligatorio}")

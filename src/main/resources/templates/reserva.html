@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Reserva')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido my-4">
+        <h3> 
+			Confirmar Reserva 
+		</h3>
+
+            <div class="reserva-body">
+                <img th:src="@{${alojamiento.foto}}" alt="Foto del alojamiento">
+
+                <div class="reserva-info">
+                    <h4 th:text="${alojamiento.nombre}">Nombre alojamiento</h4>
+                    <p>
+                        Capacidad: <strong th:text="${alojamiento.capacidad}">0</strong> personas<br>
+                        Estancia: <strong th:text="${#temporals.format(fechaInicio, 'dd/MM/yyyy')}"></strong> -
+                        <strong th:text="${#temporals.format(fechaFin, 'dd/MM/yyyy')}"></strong><br>
+                        Total: <strong th:text="${#numbers.formatDecimal(precioTotal, 1, 2)} + ' €'"></strong>
+                    </p>
+                </div>
+
+                <p class="text-secondary mb-4">
+                    Revise los detalles de su reserva y seleccione una forma de pago para confirmar.
+                </p>
+
+                <form th:action="@{/reservar/pagar}" method="post">
+                    <input type="hidden" name="alojamientoId" th:value="${alojamiento.id}">
+                    <input type="hidden" name="fechaInicio" th:value="${fechaInicio}">
+                    <input type="hidden" name="fechaFin" th:value="${fechaFin}">
+                    <input type="hidden" name="precioTotal" th:value="${precioTotal}">
+
+                    <div class="mb-3">
+                        <label for="formaPago" class="form-label">Forma de pago</label>
+                        <select class="form-select" id="formaPago" name="formaPago" required>
+                            <option value="" selected disabled>Seleccione una opción...</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="alojamiento">Pago en el alojamiento</option>
+                            <option value="transferencia">Transferencia bancaria</option>
+                        </select>
+                    </div>
+
+                    <div class="reserva-condiciones">
+                        <p>
+                            Recibirá un correo electrónico de confirmación cuando su reserva esté validada.
+                        </p>
+                        <p>
+                            Solo podrá cancelar la reserva con al menos <strong>7 días</strong> de antelación a la fecha de inicio de la misma.
+                        </p>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn-verde w-100">
+                            Confirmar Reserva
+                        </button>
+                    </div>
+                </form>
+            </div>
+    
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

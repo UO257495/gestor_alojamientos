@@ -2,6 +2,7 @@ package com.nayarasanchez.gestor_alojamientos.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,7 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long>{
             @Param("fechaFin") LocalDate fechaFin
     );
 
+    Optional<Alojamiento> findById(Long id);
 
     
 }

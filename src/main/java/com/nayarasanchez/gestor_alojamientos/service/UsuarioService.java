@@ -15,6 +15,7 @@ import org.passay.PasswordValidator;
 import org.passay.PropertiesMessageResolver;
 import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -97,14 +98,21 @@ public class UsuarioService {
         }
     }
 
-    public Usuario crearUsuario(UsuarioForm form, String password) {
+    public Usuario crearUsuario(UsuarioForm form, String password, Authentication auth) {
         Usuario usuario = new Usuario();
         usuario.setNombre(form.getNombre());
         usuario.setEmail(form.getEmail());
         usuario.setDni(form.getDni());
         usuario.setTelefono(form.getTelefono());
-        usuario.setRol(form.getRol());
         usuario.setPassword(passwordEncoder.encode(password));
+        // Si el usuario no está logueado o no tiene permisos para cambiar rol
+        if (auth == null || !auth.isAuthenticated() || 
+            auth.getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_PROPIETARIO"))) {
+            usuario.setRol(Rol.CLIENTE);
+        } else {
+            usuario.setRol(form.getRol());
+        }
         return usuarioRepository.save(usuario);
     }
 

@@ -1,4 +1,4 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <body>
 
     <!-- ====================================================================================== -->
@@ -24,7 +24,7 @@
 					</li>
 					</div>
 					<div >
-						<li class="nav-item dropdown">
+						<li class="nav-item dropdown"  sec:authorize="hasAnyRole('PROPIETARIO', 'ADMIN')">
 							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
 								<i class="fa-solid fa-list-check"></i> Gestión
 							</a>
@@ -58,7 +58,7 @@
 						</li>
 					</div>
 
-					<li class="nav-item dropdown">
+					<li class="nav-item dropdown" sec:authorize="isAuthenticated()">
 						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
 							<i class="fa-regular fa-circle-user"></i>
 						</a>

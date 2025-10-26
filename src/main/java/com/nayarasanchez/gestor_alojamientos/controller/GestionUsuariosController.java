@@ -1,9 +1,11 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
+import java.net.Authenticator;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -53,7 +55,7 @@ public class GestionUsuariosController {
                         @RequestParam("confirmarPassword") String confirmarPassword,
                         @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
                         BindingResult result, Model model, Locale locale,
-                        RedirectAttributes redirectAttributes) {
+                        RedirectAttributes redirectAttributes, Authentication auth) {
 
         if (result.hasErrors() || !password.equals(confirmarPassword)) {
             model.addAttribute("roles", Rol.values());
@@ -78,11 +80,17 @@ public class GestionUsuariosController {
             return "gestion/usuarios/detalle";
         }
 
-        Usuario usuario = usuarioService.crearUsuario(usuarioForm, password);
-        redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
-                messageSource.getMessage("formulario.guardado", null, locale)));
-
-        return "redirect:/gestion/usuarios/detalle?id=" + usuario.getId();
+        Usuario usuario = usuarioService.crearUsuario(usuarioForm, password, auth);
+        if(auth == null){
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
+                messageSource.getMessage("creacion.usuario.cliente", null, locale)));
+                return "redirect:/login";
+        } else{
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
+                    messageSource.getMessage("formulario.guardado", null, locale)));
+            
+            return "redirect:/gestion/usuarios/detalle?id=" + usuario.getId();
+        }
     }
 
     @PostMapping("/editar")
