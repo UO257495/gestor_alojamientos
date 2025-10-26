@@ -19,19 +19,12 @@
             <section class="container my-3">
 
                 <!-- FORMULARIO DE BÚSQUEDA -->
-                <form th:action="@{/gestion/alojamientos/buscar}" th:object="${busquedaForm}" method="get" id="busquedaForm" class="mb-4">
+                <form th:action="@{/buscarAlojamientos}" th:object="${busquedaForm}" method="get" id="busquedaForm" class="mb-4">
 
                     <div class="mb-3 row">
-                        <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
+                        <label for="ubicacioin" class="col-sm-2 col-form-label">Ubicación</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" placeholder="Ej: Casa Rural El Bosque" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label for="ubicacion" class="col-sm-2 col-form-label">Ubicación</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="ubicacion" th:field="*{ubicacion}" placeholder="Ej: Asturias" />
+                            <input type="text" class="form-control" id="ubicacion" th:field="*{ubicacion}"  />
                         </div>
                     </div>
 
@@ -60,10 +53,26 @@
                 </form>
             </section>
          </div>
+
         <!-- MAPA -->
-        <div id="map"></div>
+        <div id="map" style="height: 400px; border-radius: 10px; margin-top: 20px;"></div>
+
 
         <!-- LISTADO -->
+         <div id="resultados" class="row gy-3">
+            <div class="col-md-4 mb-3" th:each="alojamiento : ${resultados}">
+                <div class="card">
+                    <img th:src="@{${alojamiento.foto}}" class="card-img-top" alt="Foto de alojamiento">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${alojamiento.nombre}">Nombre</h5>
+                        <p class="card-text" th:text="${alojamiento.direccion}">Ubicación</p>
+                        <p class="card-text">Capacidad: <span th:text="${alojamiento.capacidad}">0</span> personas</p>
+                        <a th:href="@{'/reservar/' + ${alojamiento.id}}" class="btn btn-verde">RESERVAR</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </section>
 
@@ -72,66 +81,90 @@
 
 	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
 
-    <script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
-    <script>
-        // Inicializar mapa
-        const map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-            source: new ol.source.OSM()
+    <script th:inline="javascript">
+        /* <![CDATA[ */
+        const map = L.map('map').setView([43.36, -5.85], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let markers = L.featureGroup().addTo(map);
+
+        // Función para pintar alojamientos en el mapa y listado
+        function pintarAlojamientos(alojamientos) {
+            markers.clearLayers();
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '';
+
+            alojamientos.forEach(a => {
+                const lat = parseFloat(a.latitud);
+                const lon = parseFloat(a.longitud);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    const marker = L.marker([lat, lon])
+                    .bindPopup(`
+                        <div class="card" style="width: 200px;">
+                            <img src="${a.foto}" class="card-img-top" alt="Foto de alojamiento" style="height:120px; object-fit:cover;">
+                            <div class="card-body text-center p-2">
+                                <h6 class="card-title mb-1">${a.nombre}</h6>
+                                <p class="card-text mb-2">Capacidad: ${a.capacidad} personas</p>
+                                <a href="/reservar/${a.id}" class="btn btn-success btn-sm w-100">RESERVAR</a>
+                            </div>
+                        </div>
+                    `);
+                    markers.addLayer(marker);
+                }
+
+                // Listado HTML
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                card.innerHTML = `
+                    <div class="card">
+                        <img src="${a.foto}" class="card-img-top" alt="Foto de alojamiento">
+                        <div class="card-body">
+                            <h5 class="card-title">${a.nombre}</h5>
+                            <p class="card-text">${a.direccion}</p>
+                            <p class="card-text">Capacidad: ${a.capacidad} personas</p>
+                            <a href="/reservar/${a.id}" class="btn btn-success btn-sm w-100">RESERVAR</a>
+                        </div>
+                    </div>
+                `;
+                resultadosDiv.appendChild(card);
+            });
+
+            if (alojamientos.length > 0) {
+                map.fitBounds(markers.getBounds().pad(0.2));
+            }
+        }
+
+        // Cargar todos los alojamientos al inicio
+        fetch('/api/alojamientos')
+            .then(res => res.json())
+            .then(alojamientos => pintarAlojamientos(alojamientos));
+
+        // Evento del formulario para filtrar
+        const form = document.getElementById('busquedaForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                ubicacion: document.getElementById('ubicacion').value || null,
+                personas: parseInt(document.getElementById('personas').value) || null,
+                fechaInicio: document.getElementById('fechaInicio').value || null,
+                fechaFin: document.getElementById('fechaFin').value || null
+            };
+
+            fetch('/api/alojamientos/buscar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             })
-        ],
-        view: new ol.View({
-            center: ol.proj.fromLonLat([-5.85, 43.36]), // Centro de Asturias
-            zoom: 9
-        })
+            .then(res => res.json())
+            .then(alojamientos => pintarAlojamientos(alojamientos));
         });
 
-        // Capa vectorial para puntos de resultados
-        // const vectorSource = new ol.source.Vector();
-        // const vectorLayer = new ol.layer.Vector({ source: vectorSource });
-        // map.addLayer(vectorLayer);
-
-        // Manejar formulario de búsqueda
-        // document.getElementById("busquedaForm").addEventListener("submit", function(e) {
-        // e.preventDefault();
-        // const nombre = document.getElementById("nombre").value;
-
-        // Ejemplo estático de resultados (puedes cambiarlo por tu API)
-        // const resultados = [
-        //     { nombre: "Punto A", coords: [-3.7038, 40.4168] },
-        //     { nombre: "Punto B", coords: [-0.3763, 39.4699] }
-        // ];
-
-        // Limpiar resultados anteriores
-        // document.getElementById("resultados").innerHTML = "";
-        // vectorSource.clear();
-
-        // // Añadir resultados al listado y al mapa
-        // resultados.forEach(r => {
-        //     // Añadir al listado
-        //     const fila = `<tr>
-        //     <td>${r.nombre}</td>
-        //     <td>${r.coords.join(", ")}</td>
-        //     </tr>`;
-        //     document.getElementById("resultados").insertAdjacentHTML("beforeend", fila);
-
-        //     // Añadir marcador en el mapa
-        //     const feature = new ol.Feature({
-        //     geometry: new ol.geom.Point(ol.proj.fromLonLat(r.coords)),
-        //     name: r.nombre
-        //     });
-        //     vectorSource.addFeature(feature);
-        // });
-
-        // // Ajustar vista del mapa a los resultados
-        // if (resultados.length > 0) {
-        //     const extent = vectorSource.getExtent();
-        //     map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 12 });
-        // }
-        // });
+        /* ]]> */
     </script>
+
 
 </body>
 </html>
