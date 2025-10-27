@@ -16,6 +16,7 @@ import org.passay.PropertiesMessageResolver;
 import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,10 @@ public class UsuarioService {
 
     public Optional<Usuario> obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id);
+    }
+
+    public Optional<Usuario> obtenerUsuarioPorEmail(String email){
+        return usuarioRepository.findByEmail(email);
     }
 
     public void eliminarUsuario(Long id) {

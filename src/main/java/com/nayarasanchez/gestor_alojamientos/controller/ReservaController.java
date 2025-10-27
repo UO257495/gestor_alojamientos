@@ -1,26 +1,27 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
+import com.nayarasanchez.gestor_alojamientos.model.Rol;
+import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.temporal.ChronoUnit;
+import com.nayarasanchez.gestor_alojamientos.service.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,24 +32,43 @@ public class ReservaController {
 
     private final AlojamientoService alojamientoService;
     private final ReservaService reservaService;
+    private final UsuarioService usuarioService;
     //private final EmailService emailService; // TODO:
+
 
     @GetMapping("/{id}")
     public String verReserva(@PathVariable Long id,
-                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
-                             Model model) {
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+                            Model model) {
 
-        Alojamiento alojamiento = alojamientoService.buscarPorId(id).get();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+         Usuario usuarioActual = usuarioService.obtenerUsuarioPorEmail(username)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Alojamiento alojamiento = alojamientoService.buscarPorId(id).orElseThrow();
+
+        if (fechaInicio == null) fechaInicio = LocalDate.now();
+        if (fechaFin == null) fechaFin = fechaInicio.plusDays(1);
+
         double precioTotal = reservaService.calcularTotal(alojamiento.getId(), fechaInicio, fechaFin);
 
-        model.addAttribute("alojamiento", alojamiento);
-        model.addAttribute("fechaInicio", fechaInicio);
-        model.addAttribute("fechaFin", fechaFin);
-        model.addAttribute("precioTotal", precioTotal);
+        ReservaForm form = new ReservaForm();
+        form.setAlojamientoId(alojamiento.getId());
+        form.setClienteId(usuarioActual.getId());
+        form.setFechaInicio(fechaInicio);
+        form.setFechaFin(fechaFin);
+        form.setPrecioTotal(precioTotal);
 
-        return "reserva";
+        model.addAttribute("reservaForm", form);
+        model.addAttribute("alojamiento", alojamiento);
+        model.addAttribute("clienteNombre", usuarioActual.getNombre());
+
+        return "/reserva";
     }
+
 
     // @PostMapping("/pagar")
     // public String procesarPago(@RequestParam Long alojamientoId,
@@ -72,5 +92,7 @@ public class ReservaController {
     //         return "redirect:/mis-reservas";
     //     }
     // }
+
+
 }
 

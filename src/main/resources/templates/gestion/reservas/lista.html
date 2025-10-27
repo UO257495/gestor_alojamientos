@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
 	<th:block th:replace="~{fragments/head :: head ('Reservas')}"></th:block>
 </head>
@@ -11,7 +11,8 @@
 
         <h1 class="mb-4">
             <i class="fa-solid fa-calendar-days text-secondary"></i> Reservas 
-            <a class="btn btn-success btn-sm me-2" title="Nueva Reserva" th:href="@{/gestion/reservas/detalle}"><i class="fa-solid fa-plus"></i></a>
+            <a class="btn btn-success btn-sm me-2" title="Nueva Reserva" sec:authorize="hasAnyRole('ADMIN','PROPIETARIO')"
+            th:href="@{/gestion/reservas/detalle}"><i class="fa-solid fa-plus"></i></a>
         </h1>
 
         <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>

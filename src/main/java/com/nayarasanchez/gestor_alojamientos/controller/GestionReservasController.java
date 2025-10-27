@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,8 +25,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
-import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
+import com.nayarasanchez.gestor_alojamientos.model.Rol;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
@@ -45,7 +47,30 @@ public class GestionReservasController {
 
     @GetMapping("/lista")
     public String lista(Model model) {
-        model.addAttribute("reservas", reservaService.listarTodas());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual;
+        Object principal = auth.getPrincipal();
+
+        if (principal instanceof Usuario) {
+            usuarioActual = (Usuario) principal;
+        } else {
+            // Si usas org.springframework.security.core.userdetails.User
+            // necesitas buscar el Usuario real desde la base de datos
+            String username = ((UserDetails) principal).getUsername();
+            usuarioActual = usuarioService.obtenerUsuarioPorEmail(username).get();
+        }
+        
+        List<Reserva> reservas;
+
+        if (usuarioActual.getRol() == Rol.CLIENTE) {
+            // Solo las reservas de este cliente
+            reservas = reservaService.buscarPorClienteId(usuarioActual.getId());
+        } else {
+            // Admin y propietario ven todas
+            reservas = reservaService.listarTodas();
+        }
+
+        model.addAttribute("reservas", reservas);
         return "gestion/reservas/lista";
     }
 

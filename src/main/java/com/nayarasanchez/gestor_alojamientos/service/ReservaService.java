@@ -43,6 +43,13 @@ public class ReservaService {
         return reservaRepository.findById(id);
     }
 
+     /**
+     * Busca un reserva por email del cliente
+     */
+    public List<Reserva> buscarPorClienteId(Long id) {
+        return reservaRepository.findByClienteId(id);
+    }
+
     
     /**
      * Crea o actualiza una reserva

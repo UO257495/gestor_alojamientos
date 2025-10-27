@@ -44,7 +44,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
 
           http.formLogin(login -> login
-            .loginPage("/login")
+            .loginPage("/auth/login")
+            .loginProcessingUrl("/auth/login")
             .defaultSuccessUrl("/inicio", true)
             .usernameParameter("email") 
             .passwordParameter("password")

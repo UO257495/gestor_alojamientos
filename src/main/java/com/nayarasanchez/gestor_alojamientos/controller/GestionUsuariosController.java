@@ -130,5 +130,16 @@ public class GestionUsuariosController {
         usuarioService.eliminarUsuario(id);
         return "redirect:lista";
     }
+
+    @GetMapping("/perfil")
+    public String perfil(Model model, Authentication auth) {
+        String email = auth.getName(); 
+        Usuario usuario = usuarioService.obtenerUsuarioPorEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("soloLecturaRoles", true);
+        return "gestion/usuarios/detalle"; 
+    }
+
     
 }
