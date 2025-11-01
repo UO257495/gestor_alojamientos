@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head('Estadísticas de Reservas')}"></th:block>
+</head>
+<body>
+<div th:replace="~{fragments/menu :: principal}"></div>
+
+<section class="container my-5">
+    <h1><i class="fa-solid fa-chart-pie text-secondary"></i> Estadísticas de Reservas</h1>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-6 my-3">
+            <h5>Reservas por estado</h5>
+            <div id="chartEstados" style="height: 300px;"></div>
+        </div>
+
+        <div class="col-md-6 my-3">
+            <h5>Reservas por forma de pago</h5>
+            <div id="chartPagos" style="height: 300px;"></div>
+        </div>
+
+        <div class="col-md-12 my-3">
+            <h5>Evolución mensual de reservas</h5>
+            <div id="chartMensual" style="height: 400px;"></div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{fragments/menu :: pie}"></div>
+
+<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+<script th:inline="javascript">
+    const dataEstados = [[${estadisticasEstados}]];
+    const dataPagos = [[${estadisticasPagos}]];
+    const dataMensual = [[${estadisticasMensuales}]];
+</script>
+
+<script>
+    
+    // Gráfico circular de estados
+    var chartEstados = echarts.init(document.getElementById('chartEstados'));
+    chartEstados.setOption({
+        tooltip: { trigger: 'item' },
+        series: [{
+            name: 'Estado',
+            type: 'pie',
+            radius: '70%',
+            data: dataEstados,
+            emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } }
+        }]
+    });
+
+    // Gráfico circular de forma de pago
+    var chartPagos = echarts.init(document.getElementById('chartPagos'));
+    chartPagos.setOption({
+        tooltip: { trigger: 'item' },
+        series: [{
+            name: 'Forma de pago',
+            type: 'pie',
+            radius: '70%',
+            data: dataPagos
+        }]
+    });
+
+    // Gráfico de líneas mensual
+    var chartMensual = echarts.init(document.getElementById('chartMensual'));
+    chartMensual.setOption({
+        xAxis: { type: 'category', data: dataMensual.labels },
+        yAxis: { type: 'value' },
+        tooltip: { trigger: 'axis' },
+        series: [{ data: dataMensual.values, type: 'line', smooth: true }]
+    });
+</script>
+
+</body>
+</html>

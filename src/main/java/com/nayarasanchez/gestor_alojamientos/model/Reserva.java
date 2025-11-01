@@ -48,5 +48,9 @@ public class Reserva {
 
     @Column(name = "precio_total", nullable = false)
     private Double precioTotal = 0.0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "forma_pago")
+    private FormaPago formaPago;
     
 }

@@ -26,9 +26,18 @@
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Cliente <span class="text-danger">*</span></label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-10" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
                             <select id="clienteSelect" class="form-select" th:field="*{clienteId}">
                                 <option value="">Seleccione un cliente...</option>
+                                <option th:each="c : ${clientes}" 
+                                        th:value="${c.id}" 
+                                        th:text="${c.nombre}" 
+                                        th:selected="${reserva.clienteId != null and reserva.clienteId == c.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-sm-10" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                            <select id="clienteSelect" class="form-select" th:field="*{clienteId}" disabled>
                                 <option th:each="c : ${clientes}" 
                                         th:value="${c.id}" 
                                         th:text="${c.nombre}" 
@@ -40,7 +49,7 @@
 
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Alojamiento <span class="text-danger">*</span></label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-10" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
                             <select id="alojamientoSelect" class="form-select" th:field="*{alojamientoId}">
                                 <option value="">Seleccione alojamiento...</option>
                                 <option th:each="a : ${alojamientos}" 
@@ -50,6 +59,15 @@
                                 </option>
                             </select>
                         </div>
+                            <div class="col-sm-10" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                                <select id="alojamientoSelect" class="form-select" th:field="*{alojamientoId}" disabled>
+                                    <option th:each="a : ${alojamientos}" 
+                                            th:value="${a.id}" 
+                                            th:text="${a.nombre}" 
+                                            th:selected="${reserva.alojamientoId != null and reserva.alojamientoId == a.id}">
+                                    </option>
+                                </select>
+                            </div>
                     </div>
 
                     <div class="mb-3 row">
@@ -104,6 +122,38 @@
                         </div>
                     </div>
 
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Forma de pago 
+                            <span class="text-danger" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">*</span>
+                        </label>
+                        
+                        <div class="col-sm-4" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
+                            <select th:field="*{formaPago}" class="form-select" id="formaPagoSelect">
+                                <option value="">Seleccione una forma de pago...</option>
+                                <option th:value="${T(com.nayarasanchez.gestor_alojamientos.model.FormaPago).ALOJAMIENTO}"
+                                        th:text="'Pago en el alojamiento'"></option>
+                                <option th:value="${T(com.nayarasanchez.gestor_alojamientos.model.FormaPago).TRANSFERENCIA}"
+                                        th:text="'Transferencia bancaria'"></option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-4" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                            <div th:switch="${reserva.formaPago?.name()}">
+                                <input type="text" class="form-control" 
+                                    th:case="'ALOJAMIENTO'" 
+                                    th:value="'Pago en el alojamiento'" readonly />
+
+                                <input type="text" class="form-control" 
+                                    th:case="'TRANSFERENCIA'" 
+                                    th:value="'Transferencia bancaria'" readonly />
+
+                                <input type="text" class="form-control" 
+                                    th:case="*"
+                                    th:value="''" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Solo lectura para clientes -->
                     <div class="mb-3 row" th:if="${#authorization.expression('hasRole(''PROPIETARIO'')')}">
                         <label class="col-sm-2 col-form-label">Estado</label>

@@ -70,10 +70,34 @@ public class ReservaService {
         reserva.setAlojamiento(alojamiento);
 
         reserva.setPrecioTotal(form.getPrecioTotal());
+        reserva.setFormaPago(form.getFormaPago());
 
         return reservaRepository.save(reserva);
     }
 
+        /**
+     * Crea o actualiza una reserva nueva de un cliente
+     */
+    public Reserva crearReservaCliente(ReservaForm form) {
+        Reserva reserva = (form.getId() != null)
+                ? reservaRepository.findById(form.getId()).orElse(new Reserva())
+                : new Reserva();
+
+        reserva.setFechaInicio(form.getFechaInicio());
+        reserva.setFechaFin(form.getFechaFin());
+        reserva.setEstado(EstadoReserva.PENDIENTE);
+
+        Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
+        reserva.setCliente(cliente);
+
+        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
+        reserva.setAlojamiento(alojamiento);
+
+        reserva.setPrecioTotal(form.getPrecioTotal());
+        reserva.setFormaPago(form.getFormaPago());
+
+        return reservaRepository.save(reserva);
+    }
 
     public void eliminar(Long id) {
         reservaRepository.deleteById(id);

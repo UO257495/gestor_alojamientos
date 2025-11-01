@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (fin < inicio) return;
 
         const dias = (fin - inicio)/(1000*60*60*24) + 1;
-        const precioBase = [[${alojamiento.tarifaBase}]]; 
+        const precioBase = TARIFA_BASE;
         const total = precioBase * dias;
 
         precioTotalCard.textContent = total.toFixed(2) + ' €';
@@ -137,6 +137,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar fechas ocupadas según alojamientoId
     if (alojamientoIdInput.value) {
         cargarFechasOcupadas(alojamientoIdInput.value);
+    }
+
+    //Gestion forma de pago
+    const selectPago = document.getElementById("formaPagoSelect");
+    const formaPagoCard = document.getElementById("formaPagoCard");
+
+    if (selectPago && formaPagoCard) {
+        selectPago.addEventListener("change", () => {
+            const texto = selectPago.options[selectPago.selectedIndex].text;
+            formaPagoCard.textContent = texto;
+        });
     }
 
 });

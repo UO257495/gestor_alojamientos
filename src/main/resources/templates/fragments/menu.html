@@ -50,7 +50,7 @@
 									</a>
 								</li>
 								<li>
-									<a class="dropdown-item" th:href="@{/gestion/reservas/lista}">
+									<a class="dropdown-item" th:href="@{/gestion/reservas/estadisticas}">
 										<i class="fa-solid fa-chart-bar"></i> Estadísticas
 									</a>
 								</li>
@@ -68,7 +68,7 @@
 									<i class="fa-solid fa-user-circle"></i> Mi Perfil
 								</a>
 							</li>
-							<li>
+							<li sec:authorize="hasRole('CLIENTE')">
 								<a class="dropdown-item" th:href="@{/gestion/reservas/lista}">
 									<i class="fa-solid fa-calendar-check"></i> Mis reservas
 								</a>

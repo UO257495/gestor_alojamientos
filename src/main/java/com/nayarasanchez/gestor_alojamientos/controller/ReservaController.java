@@ -1,7 +1,6 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
@@ -9,7 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -17,7 +18,6 @@ import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
-import com.nayarasanchez.gestor_alojamientos.model.Rol;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
@@ -70,29 +70,15 @@ public class ReservaController {
     }
 
 
-    // @PostMapping("/pagar")
-    // public String procesarPago(@RequestParam Long alojamientoId,
-    //                            @RequestParam LocalDate fechaInicio,
-    //                            @RequestParam LocalDate fechaFin,
-    //                            @RequestParam double precioTotal,
-    //                            @RequestParam String formaPago,
-    //                            RedirectAttributes redirectAttrs) {
+    @PostMapping("/confirmar")
+    public String confirmarReserva(@ModelAttribute("reservaForm") ReservaForm reservaForm, Model model) {
 
-    //     // Crear reserva en estado PENDIENTE
-    //     Reserva reserva = reservaService.crearReserva(alojamientoId, fechaInicio, fechaFin, precioTotal, formaPago);
+        reservaService.crearReservaCliente(reservaForm);
 
-    //     // Enviar email de confirmación
-    //     //emailService.enviarConfirmacion(reserva);
-
-    //     // Redirigir según forma de pago
-    //     if ("paypal".equals(formaPago)) {
-    //         return "redirect:/pago/paypal/" + reserva.getId();
-    //     } else {
-    //         redirectAttrs.addFlashAttribute("mensaje", "Reserva creada correctamente. Se le contactará para confirmar el pago.");
-    //         return "redirect:/mis-reservas";
-    //     }
-    // }
-
+        // Puedes añadir un mensaje o redirigir
+        model.addAttribute("mensaje", "Reserva confirmada correctamente");
+        return "redirect:/gestion/reservas/lista";
+    }
 
 }
 

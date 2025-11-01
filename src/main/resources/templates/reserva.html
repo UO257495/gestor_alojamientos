@@ -11,7 +11,7 @@
         
         <section class="container my-3">
         <!-- Formulario -->
-            <form th:action="@{/reservar/pagar}" th:object="${reservaForm}" method="post" class="reserva-form mb-4">
+            <form th:action="@{/reservar/confirmar}" th:object="${reservaForm}" method="post" class="reserva-form mb-4">
                 <input type="hidden" th:field="*{alojamientoId}">
                 <input type="hidden" th:field="*{clienteId}">
                 <input type="hidden" th:field="*{precioTotal}" id="precioTotalInput">
@@ -42,54 +42,55 @@
                     </div>
                 </div>
 
-            
-        </form>
+                <!-- Forma de pago -->
+                <div class="mb-3">
+                    <label for="formaPagoSelect" class="form-label">Forma de pago <span class="text-danger">*</span></label>
+                    <select th:field="*{formaPago}" id="formaPagoSelect" class="form-select" required>
+                        <option th:value="${null}" th:text="'Seleccione una opción...'"></option>
+                        <option value="ALOJAMIENTO">Pago en el alojamiento</option>
+                        <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                    </select>
+                </div>
+
+                <section class="container my-3">
+                    <div class="reserva-card">
+                        <div class="reserva-imagen">
+                            <img th:src="@{${alojamiento.foto}}" alt="Foto del alojamiento">
+                        </div>
+                        <div class="reserva-detalles">
+                            <h2 th:text="${alojamiento.nombre}"></h2>
+                            <p><strong>Cliente:</strong> <span th:text="${clienteNombre}"></span></p>
+                            <p><strong>Capacidad:</strong> <span th:text="${alojamiento.capacidad}"></span> personas</p>
+
+                            <!-- Fechas seleccionadas -->
+                            <p><strong>Fechas seleccionadas:</strong>
+                                <span id="fechaInicioCard" th:text="${#temporals.format(reservaForm.fechaInicio, 'dd/MM/yyyy')}"></span> - 
+                                <span id="fechaFinCard" th:text="${#temporals.format(reservaForm.fechaFin, 'dd/MM/yyyy')}"></span>
+                            </p>
+
+                            <!-- Forma de pago seleccionada -->
+                            <p><strong>Forma de pago:</strong> <span id="formaPagoCard" th:text="${reservaForm.formaPago} ?: '-'"></span></p>
+
+                            <!-- Precio total -->
+                            <p><strong>Precio total:</strong> <span id="precioTotalCard" class="precio"  th:text="${#numbers.formatDecimal(reservaForm.precioTotal,1,2)} + ' €'"></span></p>
+                        
+                            <button type="submit" class="btn btn-verde w-100">Confirmar Reserva</button>
+                        </div>
+                    </div>
+                </section>
+
+            </form>
         </section>
-
-            <!-- Forma de pago 
-            <div class="mb-3">
-                <label for="formaPago">Forma de pago</label>
-                <select th:field="*{formaPago}" id="formaPagoSelect" class="form-select" required>
-                    <option value="" disabled selected>Seleccione...</option>
-                    <option value="paypal">PayPal</option>
-                    <option value="alojamiento">Pago en el alojamiento</option>
-                    <option value="transferencia">Transferencia bancaria</option>
-                </select>
-            </div>-->
-
-            
         
-        <section class="container my-3">
-            <div class="reserva-card">
-                <div class="reserva-imagen">
-                    <img th:src="@{${alojamiento.foto}}" alt="Foto del alojamiento">
-                </div>
-                <div class="reserva-detalles">
-                    <h2 th:text="${alojamiento.nombre}"></h2>
-                    <p><strong>Cliente:</strong> <span th:text="${clienteNombre}"></span></p>
-                    <p><strong>Capacidad:</strong> <span th:text="${alojamiento.capacidad}"></span> personas</p>
-
-                    <!-- Fechas seleccionadas -->
-                    <p><strong>Fechas seleccionadas:</strong>
-                        <span id="fechaInicioCard" th:text="${#temporals.format(reservaForm.fechaInicio, 'dd/MM/yyyy')}"></span> - 
-                        <span id="fechaFinCard" th:text="${#temporals.format(reservaForm.fechaFin, 'dd/MM/yyyy')}"></span>
-                    </p>
-
-                    <!-- Forma de pago seleccionada -->
-                <!-- <p><strong>Forma de pago:</strong> <span id="formaPagoCard" th:text="${reservaForm.formaPago} ?: '-'"></span></p> -->
-
-                    <!-- Precio total -->
-                    <p><strong>Precio total:</strong> <span id="precioTotalCard" class="precio"  th:text="${#numbers.formatDecimal(reservaForm.precioTotal,1,2)} + ' €'"></span></p>
-                
-                    <button type="submit" class="btn btn-verde w-100">Confirmar Reserva</button>
-                </div>
-            </div>
-        </section>
+        
 
     </section>
 
     <div th:replace="~{fragments/menu :: pie}"></div>
     <th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+    <script th:inline="javascript">
+        const TARIFA_BASE = [[${alojamiento.tarifaBase}]];
+    </script>
     <script type="module" th:src="@{/js/reserva.js}"></script>
 </body>
 </html>

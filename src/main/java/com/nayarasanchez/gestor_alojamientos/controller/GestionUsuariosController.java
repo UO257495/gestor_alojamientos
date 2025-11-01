@@ -47,6 +47,7 @@ public class GestionUsuariosController {
         Usuario usuario = id.flatMap(usuarioService::obtenerUsuarioPorId).orElse(new Usuario());
         model.addAttribute("usuario", usuario);
         model.addAttribute("roles", Rol.values());
+        model.addAttribute("soloLecturaRoles", false);
         return "gestion/usuarios/detalle";
     }
 
