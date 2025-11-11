@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
@@ -28,6 +29,9 @@ public class ReservaService {
     private final AlojamientoRepository alojamientoRepository;
     private final TemporadaRepository temporadaRepository;
     private final UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EmailService emailService;
     
     /**
      * Lista todas las reservas registrados
@@ -52,7 +56,7 @@ public class ReservaService {
 
     
     /**
-     * Crea o actualiza una reserva
+     * Crea o actualiza una reserva del propietario
      */
     public Reserva crearOActualizar(ReservaForm form) {
         Reserva reserva = (form.getId() != null)
@@ -72,11 +76,60 @@ public class ReservaService {
         reserva.setPrecioTotal(form.getPrecioTotal());
         reserva.setFormaPago(form.getFormaPago());
 
-        return reservaRepository.save(reserva);
+        //Envio de email 
+         String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
+         String mensaje = ""; 
+
+         if(form.getEstado().equals(EstadoReserva.CANCELADA)){
+            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
+                + "Tu petición de reserva del "
+                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido CANCELADA." + ".\n\n"
+                + "Precio total: " + form.getPrecioTotal() + " €.\n\n"
+                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
+                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
+                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
+                + "Gracias por confiar en nosotros.\n\n";
+            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+         }else if(form.getEstado().equals(EstadoReserva.RECHAZADA)){
+            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
+                + "Tu petición de reserva del "
+                + form.getFechaInicio() + " al " + form.getFechaFin() + " se encuentra en estado RECHAZADA." + ".\n\n"
+                + "Precio total: " + form.getPrecioTotal() + " €.\n\n"
+                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
+                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
+                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
+                + "Gracias por confiar en nosotros.\n\n";
+            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+         }else if(form.getEstado().equals(EstadoReserva.PENDIENTE)){
+            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
+                + "Tu petición de reserva del "
+                + form.getFechaInicio() + " al " + form.getFechaFin() + " se encuentra en estado PENDIENTE." + ".\n\n"
+                + "Precio total: " + form.getPrecioTotal() + " €.\n\n"
+                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
+                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
+                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
+                + "Gracias por confiar en nosotros.\n\n";
+            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+         }else if(form.getEstado().equals(EstadoReserva.CONFIRMADA)){
+            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
+                + "Tu petición de reserva del "
+                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido CONFIRMADA."  + ".\n"
+                + "Esperamos con gusto su visita" + ".\n\n"
+                + "Precio total: " + form.getPrecioTotal() + " €.\n\n"
+                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
+                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
+                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
+                + "Gracias por confiar en nosotros.\n\n";
+            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+         }
+
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+
+        return reservaGuardada;
     }
 
         /**
-     * Crea o actualiza una reserva nueva de un cliente
+     * Crea o actualiza una reserva de un cliente
      */
     public Reserva crearReservaCliente(ReservaForm form) {
         Reserva reserva = (form.getId() != null)
@@ -96,7 +149,24 @@ public class ReservaService {
         reserva.setPrecioTotal(form.getPrecioTotal());
         reserva.setFormaPago(form.getFormaPago());
 
-        return reservaRepository.save(reserva);
+        
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+
+        //Enviar email de recepción
+        String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
+        String mensaje = "Hola " + cliente.getNombre() + ",\n\n"
+                + "Tu petición de reserva del "
+                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido recibida." + ".\n"
+                + "Recibirás otro email con la confirmación" + ".\n\n"
+                + "Precio total: " + form.getPrecioTotal() + " €.\n\n"
+                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
+                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
+                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
+                + "Gracias por confiar en nosotros.\n\n";
+
+        emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+
+        return reservaGuardada;
     }
 
     public void eliminar(Long id) {
