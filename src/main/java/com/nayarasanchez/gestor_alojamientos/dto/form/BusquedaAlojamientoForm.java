@@ -15,10 +15,10 @@ public class BusquedaAlojamientoForm {
     
     private Integer personas;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate fechaInicio;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate fechaFin;
 
 }

@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Desactivar inputs hasta seleccionar alojamiento
-    fechaInicioInput.disabled = true;
-    fechaFinInput.disabled = true;
+    fechaInicioInput.setAttribute('readonly', true);
+    fechaFinInput.setAttribute('readonly', true);
 
     //-------------------------------------------------------------------------------------------------
     // Función para cargar fechas ocupadas del alojamiento
@@ -198,12 +198,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const alojamientoId = alojamientoSelect.value;
 
         if (alojamientoId) {
-            fechaInicioInput.disabled = false;
-            fechaFinInput.disabled = false;
+            // Activamos los inputs para poder usar Tempus Dominus
+            fechaInicioInput.removeAttribute('readonly');
+            fechaFinInput.removeAttribute('readonly');
+
             await cargarFechasOcupadas(alojamientoId);
         } else {
-            fechaInicioInput.disabled = true;
-            fechaFinInput.disabled = true;
+            fechaInicioInput.setAttribute('readonly', true);
+            fechaFinInput.setAttribute('readonly', true);
             fechaInicioInput.value = "";
             fechaFinInput.value = "";
             totalInput.value = "";
@@ -223,8 +225,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     if (alojamientoSelect.value) {
-        fechaInicioInput.disabled = false;
-        fechaFinInput.disabled = false;
+        fechaInicioInput.removeAttribute('readonly');
+        fechaFinInput.removeAttribute('readonly');
         cargarFechasOcupadas(alojamientoSelect.value);
     }
 

@@ -37,7 +37,7 @@
                             </select>
                         </div>
                         <div class="col-sm-10" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
-                            <select id="clienteSelect" class="form-select" th:field="*{clienteId}" disabled>
+                            <select id="clienteSelectCliente" class="form-select" th:field="*{clienteId}" disabled>
                                 <option th:each="c : ${clientes}" 
                                         th:value="${c.id}" 
                                         th:text="${c.nombre}" 
@@ -60,7 +60,7 @@
                             </select>
                         </div>
                             <div class="col-sm-10" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
-                                <select id="alojamientoSelect" class="form-select" th:field="*{alojamientoId}" disabled>
+                                <select id="alojamientoSelectCliente" class="form-select" th:field="*{alojamientoId}" disabled>
                                     <option th:each="a : ${alojamientos}" 
                                             th:value="${a.id}" 
                                             th:text="${a.nombre}" 
@@ -175,7 +175,7 @@
             
                     <div class="my-4 text-end">
                         <a class="btn btn-warning text-dark ms-2 custom-hover"
-                        th:if="${reserva.estado.toString() == 'CONFIRMADA'
+                        th:if="${reserva.estado == T(com.nayarasanchez.gestor_alojamientos.model.EstadoReserva).CONFIRMADA
                             and reserva.fechaFin != null
                             and reserva.fechaFin.isBefore(T(java.time.LocalDate).now())
                             and reserva.valoracion == null 
@@ -200,7 +200,7 @@
 
 	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
 
-    <script type="module" th:src="@{/js/gestion/reservas/detalle.js}"></script>
+    <script th:src="@{/js/gestion/reservas/detalle.js}"></script>
 
     
 </body>

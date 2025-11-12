@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
-import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
-import com.nayarasanchez.gestor_alojamientos.model.Reserva;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
@@ -33,8 +31,6 @@ public class ReservaController {
     private final AlojamientoService alojamientoService;
     private final ReservaService reservaService;
     private final UsuarioService usuarioService;
-    //private final EmailService emailService; // TODO:
-
 
     @GetMapping("/{id}")
     public String verReserva(@PathVariable Long id,
@@ -49,9 +45,6 @@ public class ReservaController {
         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Alojamiento alojamiento = alojamientoService.buscarPorId(id).orElseThrow();
-
-        if (fechaInicio == null) fechaInicio = LocalDate.now();
-        if (fechaFin == null) fechaFin = fechaInicio.plusDays(1);
 
         double precioTotal = reservaService.calcularTotal(alojamiento.getId(), fechaInicio, fechaFin);
 
