@@ -20,7 +20,7 @@
 
             <section class="container my-3">
                 
-                <form th:action="${alojamiento.id == null} ? 'nuevo' : 'editar'" method="post" th:object="${alojamiento}" enctype="multipart/form-data">
+                <form th:action="@{/gestion/alojamientos/guardar}" method="post" th:object="${alojamiento}" enctype="multipart/form-data">
 
                     <input type="hidden" name="id" th:field="*{id}" />
 

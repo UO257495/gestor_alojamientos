@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.AlojamientoForm;
 import com.nayarasanchez.gestor_alojamientos.dto.form.BusquedaAlojamientoForm;
+import com.nayarasanchez.gestor_alojamientos.dto.view.MensajeUsuario;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 
@@ -43,21 +45,28 @@ public class GestionAlojamientosController {
         return "gestion/alojamientos/detalle";
     }
 
-    @PostMapping("/nuevo")
-    public String nuevo(@Valid @ModelAttribute("alojamiento") AlojamientoForm alojamientoForm,
-                        BindingResult result, Model model) {
+    @PostMapping("/guardar")
+    public String guardar(@Valid @ModelAttribute("alojamiento") AlojamientoForm alojamientoForm,
+                        BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             return "gestion/alojamientos/detalle";
         }
 
         try {
-            Alojamiento alojamiento = alojamientoService.crearOActualizar(alojamientoForm);
-            return "redirect:/gestion/alojamientos/detalle?id=" + alojamiento.getId();
+            alojamientoService.crearOActualizar(alojamientoForm);
+
+            String mensaje = (alojamientoForm.getId() == null)
+                    ? "Alojamiento creado correctamente"
+                    : "Alojamiento actualizado correctamente";
+
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(mensaje));
+            return "redirect:/gestion/alojamientos/lista";
         } catch (Exception e) {
-            model.addAttribute("mensajeUsuario", "Error guardando el alojamiento");
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Error guardando el alojamiento"));
             return "gestion/alojamientos/detalle";
         }
     }
+
 
 
     @GetMapping("/buscar")

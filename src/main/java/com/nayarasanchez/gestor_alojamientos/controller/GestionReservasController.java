@@ -54,8 +54,6 @@ public class GestionReservasController {
         if (principal instanceof Usuario) {
             usuarioActual = (Usuario) principal;
         } else {
-            // Si usas org.springframework.security.core.userdetails.User
-            // necesitas buscar el Usuario real desde la base de datos
             String username = ((UserDetails) principal).getUsername();
             usuarioActual = usuarioService.obtenerUsuarioPorEmail(username).get();
         }
@@ -63,10 +61,8 @@ public class GestionReservasController {
         List<Reserva> reservas;
 
         if (usuarioActual.getRol() == Rol.CLIENTE) {
-            // Solo las reservas de este cliente
             reservas = reservaService.buscarPorClienteId(usuarioActual.getId());
         } else {
-            // Admin y propietario ven todas
             reservas = reservaService.listarTodas();
         }
 
