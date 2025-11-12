@@ -1,5 +1,7 @@
 package com.nayarasanchez.gestor_alojamientos.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,9 @@ public class Valoracion {
     @Column(length = 1000)
     private String comentario;
 
+    @Column(nullable = false)
+    private LocalDate fecha;
+    
     @OneToOne
     @JoinColumn(name = "reserva_id")
     private Reserva reserva;
@@ -37,5 +42,6 @@ public class Valoracion {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Usuario cliente;
+
 
 }

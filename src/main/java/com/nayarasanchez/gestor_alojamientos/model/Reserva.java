@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,7 +44,7 @@ public class Reserva {
     @JoinColumn(name = "alojamiento_id")
     private Alojamiento alojamiento;
 
-    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL , fetch = FetchType.EAGER)
     private Valoracion valoracion;
 
     @Column(name = "precio_total", nullable = false)
@@ -52,5 +53,7 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     @Column(name = "forma_pago")
     private FormaPago formaPago;
+    
+
     
 }

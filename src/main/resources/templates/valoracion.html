@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head('Valoración')}"></th:block>
+    <link rel="stylesheet" href="/css/valoracion.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: principal}"></div>
+
+<section class="container contenido">
+
+    <h1>
+        <i class="fa-solid fa-star text-warning"></i> Dejar valoración
+    </h1>
+
+    <div class="tab-content">
+
+        <section class="container my-4">
+
+            <div class="card p-4 shadow-sm">
+                <h4 class="text-center mb-3" th:text="${reserva.alojamiento.nombre}"></h4>
+                <p class="text-center text-muted mb-4">
+                    Reserva del 
+                    <span th:text="${#temporals.format(reserva.fechaInicio, 'dd/MM/yyyy')}"></span> 
+                    al 
+                    <span th:text="${#temporals.format(reserva.fechaFin, 'dd/MM/yyyy')}"></span>
+                </p>
+
+                <form th:action="@{/valoraciones/guardar}" th:object="${valoracion}" method="post">
+
+                    <input type="hidden" name="reservaId" th:value="${reserva.id}" />
+
+                    <input type="hidden" name="clienteId" th:value="${reserva.cliente.id}" />
+
+                    <!-- Puntuación -->
+                    <div class="mb-3 text-center">
+                        <label class="form-label fw-semibold">Puntuación</label>
+                        <div class="star-rating">
+                            <input type="radio" th:field="*{puntuacion}" value="5" id="star5"><label for="star5">★</label>
+                            <input type="radio" th:field="*{puntuacion}" value="4" id="star4"><label for="star4">★</label>
+                            <input type="radio" th:field="*{puntuacion}" value="3" id="star3"><label for="star3">★</label>
+                            <input type="radio" th:field="*{puntuacion}" value="2" id="star2"><label for="star2">★</label>
+                            <input type="radio" th:field="*{puntuacion}" value="1" id="star1"><label for="star1">★</label>
+                        </div>
+                        <small th:if="${#fields.hasErrors('puntuacion')}" th:errors="*{puntuacion}" class="text-danger"></small>
+                    </div>
+
+                    <!-- Comentario -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Comentario</label>
+                        <textarea th:field="*{comentario}" class="form-control" rows="4" maxlength="1000"
+                                  placeholder="Cuéntanos tu experiencia..."></textarea>
+                        <small th:if="${#fields.hasErrors('comentario')}" th:errors="*{comentario}" class="text-danger"></small>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-success ms-2">Guardar</button>
+                        <a class="btn btn-warning text-dark border border-dark ms-2 custom-hover"
+                           th:href="@{/gestion/reservas/lista}">
+                            Cerrar
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </section>
+    </div>
+
+</section>
+
+<div th:replace="~{fragments/menu :: pie}"></div>
+<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

@@ -46,7 +46,7 @@
                     <td class="dt-right">
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-outline-primary" title="Editar" data-accion="editar" th:data-id="${reserva.id}"><i class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="btn btn-outline-danger" title="Eliminar" data-accion="eliminar" th:data-id="${reserva.id}"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="btn btn-outline-danger" title="Eliminar" data-accion="eliminar" th:data-id="${reserva.id}" sec:authorize="!hasRole('CLIENTE')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>

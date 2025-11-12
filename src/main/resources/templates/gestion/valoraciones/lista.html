@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Valoraciones')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido">
+
+        <h1 class="mb-4">
+            <i class="fa-solid fa-comments text-secondary"></i> Valoraciones
+        </h1>
+
+        <div th:if="${#lists.isEmpty(valoraciones)}" class="alert alert-info">
+            No hay valoraciones todavía.
+        </div>
+
+        <div th:each="valoracion : ${valoraciones}" class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fa-solid fa-user text-secondary"></i>
+                    <span th:text="${valoracion.reserva.cliente.nombre}"></span>
+                </h5>
+
+                <p class="mb-1">
+                    <strong>Alojamiento:</strong>
+                    <span th:text="${valoracion.reserva.alojamiento.nombre}"></span>
+                </p>
+
+                <p class="mb-1">
+                    <strong>Fecha de reserva:</strong>
+                    <span th:text="${#temporals.format(valoracion.reserva.fechaInicio, 'dd/MM/yyyy')}"></span>
+                    -
+                    <span th:text="${#temporals.format(valoracion.reserva.fechaFin, 'dd/MM/yyyy')}"></span>
+                </p>
+
+                <p class="mb-1">
+                    <strong>Puntuación:</strong>
+                    <span class="stars">
+                        <i class="fa-solid fa-star text-warning" th:each="i : ${#numbers.sequence(1, valoracion.puntuacion)}"></i>
+                        <i class="fa-regular fa-star text-warning" th:each="i : ${#numbers.sequence(valoracion.puntuacion + 1, 5)}"></i>
+                    </span>
+                </p>
+
+                <p th:text="${valoracion.comentario}" class="mt-2"></p>
+
+                <small class="text-muted" 
+                    th:text="'Valoración creada el ' + ${#temporals.format(valoracion.fecha, 'dd/MM/yyyy')}">
+                </small>
+            </div>
+        </div>
+
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

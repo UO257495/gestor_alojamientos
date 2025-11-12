@@ -169,9 +169,20 @@
                         </div>
                     </div>
 
+
+                    
                     <hr class="my-4" />
             
                     <div class="my-4 text-end">
+                        <a class="btn btn-warning text-dark ms-2 custom-hover"
+                        th:if="${reserva.estado.toString() == 'CONFIRMADA'
+                            and reserva.fechaFin != null
+                            and reserva.fechaFin.isBefore(T(java.time.LocalDate).now())
+                            and reserva.valoracion == null 
+                            and #authorization.expression('hasRole(''CLIENTE'')')}" 
+                        th:href="@{/valoraciones/nueva/{id}(id=${reserva.id})}">
+                        Dejar Valoración
+                        </a>
                         <button type="submit" class="btn btn-success ms-2">Guardar</button>
                         <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/reservas/lista}">Cerrar</a>
                     </div>

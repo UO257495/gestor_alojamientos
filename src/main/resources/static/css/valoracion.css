@@ -1,0 +1,34 @@
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f5c518; /* amarillo tipo "estrella" */
+}
+
+.custom-hover:hover {
+    background-color: #ffcd39 !important;
+    border-color: #000 !important;
+    color: #000 !important;
+    text-decoration: none;
+}
+
+.btn-warning {
+    font-weight: 400 !important;
+    font-size: 0.95rem;
+}

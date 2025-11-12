@@ -87,6 +87,7 @@ public class GestionReservasController {
         form.setPrecioTotal(reserva.getPrecioTotal());
         form.setEstado(reserva.getEstado());
         form.setFormaPago(reserva.getFormaPago());
+        form.setValoracion(reserva.getValoracion());
 
         model.addAttribute("reserva", form);
         List<Usuario> clientes = usuarioService.listarClientes();

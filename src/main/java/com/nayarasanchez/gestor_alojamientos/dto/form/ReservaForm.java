@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.FormaPago;
+import com.nayarasanchez.gestor_alojamientos.model.Valoracion;
 
 import lombok.Data;
 
@@ -31,4 +32,7 @@ public class ReservaForm {
     private Double precioTotal; //Total calculado de precio de tarifa base del alojamiento + incremento de la temporada
 
     private FormaPago formaPago;
+
+    private Valoracion valoracion;
+
 }
