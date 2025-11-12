@@ -10,6 +10,7 @@
     <section class = "container contenido">
         
         <section class="container my-3">
+            <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
         <!-- Formulario -->
             <form th:action="@{/reservar/confirmar}" th:object="${reservaForm}" method="post" class="reserva-form mb-4">
                 <input type="hidden" th:field="*{alojamientoId}">
@@ -50,6 +51,7 @@
                         <option value="ALOJAMIENTO">Pago en el alojamiento</option>
                         <option value="TRANSFERENCIA">Transferencia bancaria</option>
                     </select>
+                    <small th:if="${#fields.hasErrors('formaPago')}" th:errors="*{formaPago}" class="text-danger"></small>
                 </div>
 
                 <section class="container my-3">

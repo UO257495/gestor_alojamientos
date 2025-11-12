@@ -16,12 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Inicializar Tempus Dominus
     const tdFechaInicio = new tempusDominus.TempusDominus(fechaInicio, {
-        localization: { locale: 'es' },
+        localization: { locale: 'es', format: 'dd/MM/yyyy' },
         restrictions: { minDate: hoy }
     });
 
     const tdFechaFin = new tempusDominus.TempusDominus(fechaFin, {
-        localization: { locale: 'es' },
+        localization: { locale: 'es', format: 'dd/MM/yyyy' },
         restrictions: { minDate: hoy }
     });
 

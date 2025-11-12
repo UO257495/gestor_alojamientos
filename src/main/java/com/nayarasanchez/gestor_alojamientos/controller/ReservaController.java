@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
 import com.nayarasanchez.gestor_alojamientos.service.UsuarioService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -64,11 +66,20 @@ public class ReservaController {
 
 
     @PostMapping("/confirmar")
-    public String confirmarReserva(@ModelAttribute("reservaForm") ReservaForm reservaForm, Model model) {
+    public String confirmarReserva(@Valid @ModelAttribute("reservaForm") ReservaForm reservaForm,  BindingResult bindingResult, Model model ) {
 
+        if (reservaForm.getFechaInicio() != null && reservaForm.getFechaFin() != null
+                && reservaForm.getFechaFin().isBefore(reservaForm.getFechaInicio())) {
+            bindingResult.rejectValue("fechaFin", "error.fechaFin", "La fecha de fin no puede ser anterior a la fecha de inicio");
+        }
+
+        if (bindingResult.hasErrors()) {
+            Alojamiento alojamiento = alojamientoService.buscarPorId(reservaForm.getAlojamientoId()).orElseThrow();
+            model.addAttribute("alojamiento", alojamiento);
+            model.addAttribute("clienteNombre", usuarioService.obtenerUsuarioPorId(reservaForm.getClienteId()).get().getNombre());
+            return "/reserva"; 
+        }
         reservaService.crearReservaCliente(reservaForm);
-
-        // Puedes añadir un mensaje o redirigir
         model.addAttribute("mensaje", "Reserva confirmada correctamente");
         return "redirect:/gestion/reservas/lista";
     }
