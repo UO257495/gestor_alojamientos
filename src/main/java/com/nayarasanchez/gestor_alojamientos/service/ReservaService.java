@@ -1,10 +1,14 @@
 package com.nayarasanchez.gestor_alojamientos.service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -210,6 +214,59 @@ public class ReservaService {
     public Collection<Reserva> findByAlojamientoId(Long id) {
         return reservaRepository.findByAlojamientoId(id);
     }
+
+    public List<Reserva> obtenerReservasPorAnio(int anio) {
+        LocalDate inicio = LocalDate.of(anio, 1, 1);
+        LocalDate fin = LocalDate.of(anio, 12, 31);
+        return reservaRepository.findByFechaInicioBetween(inicio, fin);
+    }
+
+    public List<Integer> obtenerAniosConDatos() {
+        return reservaRepository.findDistinctAnios(); // consulta JPQL personalizada
+    }
+
+    public Map<Integer, Double> calcularOcupacionMensual(int anio, List<Reserva> reservas, int totalAlojamientos) {
+        return IntStream.rangeClosed(1, 12)
+            .boxed()
+            .collect(Collectors.toMap(
+                mes -> mes,
+                mes -> {
+                    YearMonth ym = YearMonth.of(anio, mes);
+                    int diasMes = ym.lengthOfMonth();
+
+                    // Map para contar ocupación por día
+                    Map<LocalDate, Long> ocupacionPorDia = IntStream.rangeClosed(1, diasMes)
+                            .mapToObj(d -> ym.atDay(d))
+                            .collect(Collectors.toMap(d -> d, d -> 0L));
+
+                    for (Reserva r : reservas) {
+                        LocalDate inicioReserva = r.getFechaInicio();
+                        LocalDate finReserva = r.getFechaFin();
+
+                        // Ajustamos la reserva para que solo cuente dentro del mes
+                        LocalDate inicio = inicioReserva.isBefore(ym.atDay(1)) ? ym.atDay(1) : inicioReserva;
+                        LocalDate fin = finReserva.isAfter(ym.atEndOfMonth()) ? ym.atEndOfMonth() : finReserva;
+
+                        if (!fin.isBefore(inicio)) {
+                            for (LocalDate d = inicio; !d.isAfter(fin); d = d.plusDays(1)) {
+                                ocupacionPorDia.put(d, ocupacionPorDia.get(d) + 1);
+                            }
+                        }
+                    }
+
+                    // Calculamos el promedio de ocupación diaria en porcentaje
+                    double ocupacionTotal = ocupacionPorDia.values().stream()
+                            .mapToDouble(c -> (c * 100.0) / totalAlojamientos)
+                            .average()
+                            .orElse(0.0);
+
+                    return ocupacionTotal;
+                }
+            ));
+    }
+
+
+
 
 }
 

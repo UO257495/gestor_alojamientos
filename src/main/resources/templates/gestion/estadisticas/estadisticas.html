@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head('Estadísticas de Reservas')}"></th:block>
+</head>
+<body>
+<div th:replace="~{fragments/menu :: principal}"></div>
+
+<section class="container my-5">
+    <!-- Cabecera con selector de año -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1><i class="fa-solid fa-chart-pie text-secondary"></i> Estadísticas de Reservas</h1>
+        <form method="get" action="#" id="formFiltroAnio">
+            <select name="anio" class="form-select" onchange="document.getElementById('formFiltroAnio').submit();">
+                <option th:each="a : ${aniosDisponibles}"
+                        th:value="${a}"
+                        th:text="${a}"
+                        th:selected="${a == anioSeleccionado}">
+                </option>
+            </select>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- Ingresos acumulados año -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5>Ingresos acumulados año <span th:text="${anioSeleccionado}"></span>: 
+                <span th:text="${ingresosAcumulados}">0</span> €
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Reservas por estado -->
+        <div class="col-md-6 my-3">
+            <h5>Reservas por estado</h5>
+            <div id="chartEstados" style="height: 300px;"></div>
+        </div>
+
+        <!-- Reservas por forma de pago -->
+        <div class="col-md-6 my-3">
+            <h5>Reservas por forma de pago</h5>
+            <div id="chartPagos" style="height: 300px;"></div>
+        </div>
+
+        <!-- Reservas totales por mes -->
+        <div class="col-md-6 my-3">
+            <h5>Reservas totales por mes</h5>
+            <div id="chartReservasMensuales" style="height: 300px;"></div>
+        </div>
+
+        <!-- Ingresos por mes -->
+        <div class="col-md-6 my-3">
+            <h5>Ingresos por mes (€)</h5>
+            <div id="chartIngresosMensuales" style="height: 300px;"></div>
+        </div>
+
+        <!-- Ocupación mensual -->
+        <div class="col-md-12 my-3">
+            <h5>Ocupación mensual (%)</h5>
+            <div id="chartOcupacionMensual" style="height: 400px;"></div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{fragments/menu :: pie}"></div>
+<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+<!-- Datos desde el backend -->
+<script th:inline="javascript">
+    const dataEstados = [[${estadisticasEstados}]];
+    const dataPagos = [[${estadisticasPagos}]];
+    const dataReservasMensuales = [[${totalReservasMes}]];
+    const dataIngresosMensuales = [[${ingresosMensuales}]];
+    const dataOcupacionMensual = [[${ocupacionMensual}]];
+</script>
+
+<script>
+    // Gráfico circular de estados
+    var chartEstados = echarts.init(document.getElementById('chartEstados'));
+    chartEstados.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: {c}' },
+        series: [{
+            name: 'Estado',
+            type: 'pie',
+            radius: '70%',
+            data: dataEstados,
+            emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } }
+        }]
+    });
+
+    // Gráfico circular de forma de pago
+    var chartPagos = echarts.init(document.getElementById('chartPagos'));
+    chartPagos.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: {c}' },
+        series: [{
+            name: 'Forma de pago',
+            type: 'pie',
+            radius: '70%',
+            data: dataPagos
+        }]
+    });
+
+    // Gráfico de líneas: reservas por mes
+    var chartReservasMensuales = echarts.init(document.getElementById('chartReservasMensuales'));
+    chartReservasMensuales.setOption({
+        xAxis: { type: 'category', data: dataReservasMensuales.labels },
+        yAxis: { type: 'value' },
+        tooltip: { trigger: 'axis', formatter: function(params){ return params[0].axisValue + ': ' + params[0].data; } },
+        series: [{
+            data: dataReservasMensuales.values,
+            type: 'line',
+            smooth: true,
+            label: { show: true, position: 'top' }
+        }]
+    });
+
+    // Gráfico de líneas: ingresos por mes
+    var chartIngresosMensuales = echarts.init(document.getElementById('chartIngresosMensuales'));
+    chartIngresosMensuales.setOption({
+        xAxis: { type: 'category', data: dataIngresosMensuales.labels },
+        yAxis: { type: 'value', axisLabel: { formatter: '€{value}' } },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) { return params[0].axisValue + ': €' + params[0].data; }
+        },
+        series: [{
+            data: dataIngresosMensuales.values,
+            type: 'line',
+            smooth: true,
+            label: { show: true, position: 'top', formatter: '{c} €' }
+        }]
+    });
+
+    // Gráfico de líneas: ocupación mensual
+    var chartOcupacionMensual = echarts.init(document.getElementById('chartOcupacionMensual'));
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const ocupacionCompletos = meses.map((m, i) => dataOcupacionMensual.labels.includes(m) 
+        ? dataOcupacionMensual.values[dataOcupacionMensual.labels.indexOf(m)] 
+        : 0
+    );
+    chartOcupacionMensual.setOption({
+        xAxis: { type: 'category', data: meses },
+        yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value} %' } },
+        tooltip: { trigger: 'axis', formatter: function(params){ return params[0].axisValue + ': ' + params[0].data + ' %'; } },
+        series: [{
+            data: ocupacionCompletos,
+            type: 'line',
+            smooth: true,
+            label: { show: true, position: 'top', formatter: '{c} %' }
+        }]
+    });
+</script>
+
+</body>
+</html>

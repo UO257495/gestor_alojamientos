@@ -181,26 +181,6 @@ public class GestionReservasController {
             .toList();
     }
 
-    @GetMapping("/estadisticas")
-    public String verEstadisticas(Model model) {
-        model.addAttribute("estadisticasEstados", List.of(
-            Map.of("name", "PENDIENTE", "value", 3),
-            Map.of("name", "CONFIRMADA", "value", 7),
-            Map.of("name", "FINALIZADA", "value", 5)
-        ));
-
-        model.addAttribute("estadisticasPagos", List.of(
-            Map.of("name", "Alojamiento", "value", 6),
-            Map.of("name", "Transferencia", "value", 4)
-        ));
-
-        model.addAttribute("estadisticasMensuales", Map.of(
-            "labels", List.of("Ene", "Feb", "Mar", "Abr", "May"),
-            "values", List.of(2, 5, 8, 4, 6)
-        ));
-
-        return "gestion/reservas/estadisticas";
-    }
 
 
 
