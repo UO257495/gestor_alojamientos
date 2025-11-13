@@ -162,6 +162,30 @@
                         </div>
                     </div>
 
+
+                    <!-- Estado del pago -->
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Estado del Pago</label>
+
+                        <!-- Editable solo por propietario o admin -->
+                        <div class="col-sm-4" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
+                            <select th:field="*{estadoPago}" class="form-select" id="estadoPagoSelect">
+                                <option value="">Seleccione estado del pago...</option>
+                                <option th:each="ep : ${T(com.nayarasanchez.gestor_alojamientos.model.EstadoPago).values()}"
+                                        th:value="${ep}" 
+                                        th:text="${ep}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Solo lectura para clientes -->
+                        <div class="col-sm-4" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                            <input type="text" class="form-control" th:value="${reserva.estadoPago}" readonly />
+                        </div>
+                    </div>
+
+                    
+
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Total (€)</label>
                         <div class="col-sm-4">
@@ -175,7 +199,7 @@
             
                     <div class="my-4 text-end">
                         <a class="btn btn-warning text-dark ms-2 custom-hover"
-                        th:if="${reserva.estado == T(com.nayarasanchez.gestor_alojamientos.model.EstadoReserva).CONFIRMADA
+                        th:if="${reserva.estado?.name() == 'CONFIRMADA'
                             and reserva.fechaFin != null
                             and reserva.fechaFin.isBefore(T(java.time.LocalDate).now())
                             and reserva.valoracion == null 

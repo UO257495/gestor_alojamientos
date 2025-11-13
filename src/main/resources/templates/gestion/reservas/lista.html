@@ -25,6 +25,7 @@
                     <th>Fecha Inicio</th>
                     <th>Fecha Fin</th>
                     <th>Estado</th>
+                    <th>Pago</th>
                     <th class="dt-right" data-dt-order="disable">Acciones</th>
                 </tr>
             </thead>
@@ -41,6 +42,13 @@
                             <span th:case="'CONFIRMADA'" class="badge bg-success">CONFIRMADA</span>
                             <span th:case="'RECHAZADA'" class="badge bg-warning text-dark">RECHAZADA</span>
                             <span th:case="*"class="badge bg-light text-dark" th:text="${reserva.estado}">OTRO</span>
+                        </span>
+                    </td>
+                    <td>
+                        <span th:switch="${reserva.estadoPago?.toString()}">
+                            <span th:case="'PENDIENTE'" class="badge bg-danger">PENDIENTE</span>
+                            <span th:case="'PAGADO'" class="badge bg-success">PAGADO</span>
+                            <span th:case="*" class="badge bg-secondary text-white" th:text="${reserva.estadoPago}">--</span>
                         </span>
                     </td>
                     <td class="dt-right">

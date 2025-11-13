@@ -84,6 +84,7 @@ public class GestionReservasController {
         form.setEstado(reserva.getEstado());
         form.setFormaPago(reserva.getFormaPago());
         form.setValoracion(reserva.getValoracion());
+        form.setEstadoPago(reserva.getEstadoPago());
 
         model.addAttribute("reserva", form);
         List<Usuario> clientes = usuarioService.listarClientes();
@@ -105,6 +106,7 @@ public class GestionReservasController {
                     .ifPresent(a -> model.addAttribute("alojamientoNombre", a.getNombre()));
         }
 
+        
         return "gestion/reservas/detalle";
     }
     

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
 import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
@@ -75,6 +76,7 @@ public class ReservaService {
 
         reserva.setPrecioTotal(form.getPrecioTotal());
         reserva.setFormaPago(form.getFormaPago());
+        reserva.setEstadoPago(form.getEstadoPago());
 
         //Envio de email 
          String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
@@ -148,6 +150,7 @@ public class ReservaService {
 
         reserva.setPrecioTotal(form.getPrecioTotal());
         reserva.setFormaPago(form.getFormaPago());
+        reserva.setEstadoPago(EstadoPago.PENDIENTE);
 
         
         Reserva reservaGuardada = reservaRepository.save(reserva);

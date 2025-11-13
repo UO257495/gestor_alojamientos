@@ -53,6 +53,10 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     @Column(name = "forma_pago")
     private FormaPago formaPago;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_pago")
+    private EstadoPago estadoPago;
     
 
     

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
 import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.FormaPago;
 import com.nayarasanchez.gestor_alojamientos.model.Valoracion;
@@ -41,6 +42,8 @@ public class ReservaForm {
 
     @NotNull(message = "Debe seleccionar la forma de pago")
     private FormaPago formaPago;
+
+    private EstadoPago estadoPago;
 
     private Valoracion valoracion;
 
