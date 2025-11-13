@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,7 +47,7 @@ public class GestionReservasController {
     
 
     @GetMapping("/lista")
-    public String lista(Model model) {
+    public String lista(Model model, @ModelAttribute("mensajeUsuario") MensajeUsuario mensajeUsuario) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuarioActual;
         Object principal = auth.getPrincipal();
@@ -181,6 +182,13 @@ public class GestionReservasController {
             .toList();
     }
 
+    @PostMapping("/cancelar/{id}")
+    public String cancelarReserva(@PathVariable Long id, RedirectAttributes redirectAttrs) {
+        reservaService.cancelarReserva(id);
+        redirectAttrs.addFlashAttribute("mensajeUsuario",
+            MensajeUsuario.mensajeCorrecto("La reserva ha sido cancelada correctamente."));
+        return "redirect:/gestion/reservas/lista";
+    }
 
 
 

@@ -197,7 +197,17 @@
                     
                     <hr class="my-4" />
             
+                    
                     <div class="my-4 text-end">
+                        <a href="#" class="btn btn-danger ms-2"
+                        th:if="${#authorization.expression('hasRole(''CLIENTE'')') 
+                                and (reserva.estado?.name() == 'PENDIENTE' or reserva.estado?.name() == 'CONFIRMADA')
+                                and reserva.fechaInicio != null
+                                and reserva.fechaInicio.isAfter(T(java.time.LocalDate).now().plusDays(7))}"
+                        th:attr="data-id=${reserva.id}" 
+                        onclick="cancelarReserva(this)">
+                        Cancelar Reserva
+                        </a>
                         <a class="btn btn-warning text-dark ms-2 custom-hover"
                         th:if="${reserva.estado?.name() == 'CONFIRMADA'
                             and reserva.fechaFin != null
@@ -225,6 +235,28 @@
 	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
 
     <script th:src="@{/js/gestion/reservas/detalle.js}"></script>
+
+    <script>
+        function cancelarReserva(el) {
+            const id = el.getAttribute('data-id');
+
+            fetch('/gestion/reservas/cancelar/' + id, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/gestion/reservas/lista';
+                } else {
+                    alert('Error al cancelar la reserva.');
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
+    </script>
 
     
 </body>

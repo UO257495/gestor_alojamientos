@@ -180,6 +180,13 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
+    public void cancelarReserva(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
+        reserva.setEstado(EstadoReserva.CANCELADA);
+        reservaRepository.save(reserva);
+    }
+
     /**
      * Calcula el precio total de una reserva según las fechas y el alojamiento.
      */
