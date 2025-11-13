@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;
@@ -45,9 +46,17 @@ public class GestionEstadisticasController {
             .collect(Collectors.groupingBy(r -> r.getFechaInicio().getMonthValue(), Collectors.counting()));
 
         Map<Integer, Double> ingresosPorMes = reservas.stream()
-            .filter(r -> r.getPrecioTotal() != null)
-            .collect(Collectors.groupingBy(r -> r.getFechaInicio().getMonthValue(),
-                    Collectors.summingDouble(Reserva::getPrecioTotal)));
+            .filter(r -> r.getPrecioTotal() != null && r.getEstadoPago() == EstadoPago.PAGADO)
+            .collect(Collectors.groupingBy(
+                r -> r.getFechaInicio().getMonthValue(),
+                Collectors.summingDouble(Reserva::getPrecioTotal)
+            ));
+
+        double ingresosAcumulados = ingresosPorMes.values().stream()
+            .mapToDouble(Double::doubleValue)
+            .sum();
+
+        model.addAttribute("ingresosAcumulados", ingresosAcumulados);
 
         // Simulación de ocupación mensual 
         Map<Integer, Double> ocupacionPorMes = reservaService.calcularOcupacionMensual(year, reservas, alojamientos.size());
