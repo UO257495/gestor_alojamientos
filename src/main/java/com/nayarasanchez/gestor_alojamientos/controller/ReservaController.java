@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
+import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.Usuario;
 import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
 import com.nayarasanchez.gestor_alojamientos.service.ReservaService;

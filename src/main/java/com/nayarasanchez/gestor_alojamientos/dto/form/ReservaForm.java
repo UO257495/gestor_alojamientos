@@ -25,10 +25,9 @@ public class ReservaForm {
     @DateTimeFormat(pattern = "dd/MM/yyyy") 
     private LocalDate fechaFin;
 
-    @NotNull
     private int numeroPersonas;
 
-    @NotNull
+  
     private EstadoReserva estado;
 
     @NotNull
@@ -43,6 +42,7 @@ public class ReservaForm {
     @NotNull(message = "Debe seleccionar la forma de pago")
     private FormaPago formaPago;
 
+   
     private EstadoPago estadoPago;
 
     private Valoracion valoracion;
