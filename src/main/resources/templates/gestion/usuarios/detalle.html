@@ -24,7 +24,7 @@
 
                     <input type="hidden" name="id" th:field="*{id}" />
 
-                    <div class="mb-3 row"  sec:authorize="hasAnyRole('ADMIN','PROPIETARIO')" th:if="${!soloLecturaRoles}">
+                    <div class="mb-3 row"  sec:authorize="hasAnyRole('ADMIN','PROPIETARIO')" th:if="${soloLecturaRoles == false}">
                         <label for="login" class="col-sm-2 col-form-label">Permisos <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
                             <select class="form-control" id="rol" th:field="*{rol}" th:errorclass="is-invalid">
