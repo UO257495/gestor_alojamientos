@@ -11,7 +11,7 @@
 
         <h1 class="mb-4">
             <i class="fa-solid fa-user text-secondary"></i> Usuarios 
-            <a class="btn btn-success btn-sm me-2" title="Nuevo usuario" th:href="@{/gestion/usuarios/detalle}"><i class="fa-solid fa-plus"></i></a>
+            <a sec:authorize="hasAnyRole('ADMIN','PROPIETARIO')" class="btn btn-success btn-sm me-2" title="Nuevo usuario" th:href="@{/gestion/usuarios/detalle}"><i class="fa-solid fa-plus"></i></a>
         </h1>
         
         <table id="tablaUsuarios" class="table table-sm table-striped table-hover" style="width:100%">

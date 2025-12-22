@@ -36,7 +36,7 @@
 
 
          <!-- MOSTRAR ESTO SI HAY SESIÓN -->
-        <div sec:authorize="isAuthenticated()">
+        <div sec:authorize="hasRole('CLIENTE')">
             <h1>
             <i class="fa-solid fa-bed text-secondary"></i>
             Buscador de alojamientos
@@ -113,6 +113,24 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- PANTALLA DE INICIO PROPIETARIO -->
+        <div sec:authorize="hasRole('PROPIETARIO')" class="container my-5">
+
+            <div class="text-center p-5 shadow rounded bg-light">
+                <i class="fa-solid fa-house-chimney fa-4x text-success mb-3"></i>
+
+                <h1 class="mb-3">Bienvenido al Panel del Propietario</h1>
+
+                <p class="lead mb-4">
+                    Desde aquí puedes gestionar tus alojamientos, consultar reservas,
+                    controlar la disponibilidad y mucho más.
+                </p>
+            </div>
+
+        </div>
+
 
 
     </section>
