@@ -20,8 +20,13 @@
 
 					<div>
 						<li class="nav-item">
-						<a class="nav-link" th:href="@{/inicio}"><i class="fa-solid fa-house"></i> Inicio</a>
-					</li>
+							<a class="nav-link" th:href="@{/inicio}"><i class="fa-solid fa-house"></i> Inicio</a>
+						</li>
+					</div>
+					<div>
+						<li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+							<a class="nav-link" th:href="@{/buscador}"><i class="fa-solid fa-magnifying-glass"></i> Buscador</a>
+						</li>
 					</div>
 					<div >
 						<li class="nav-item dropdown"  sec:authorize="hasAnyRole('PROPIETARIO', 'ADMIN')">

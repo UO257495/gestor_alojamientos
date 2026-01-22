@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Buscador de alojamientos')}"></th:block>
+</head>
+<body>
+
+	<div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido">
+
+        <div sec:authorize="hasRole('CLIENTE')">
+            <h1>
+            <i class="fa-solid fa-bed text-secondary"></i>
+            Buscador de alojamientos
+            </h1>
+            <hr>
+
+            <div class="tab-content">
+
+                <section class="container my-3">
+
+                    <!-- FORMULARIO DE BÚSQUEDA -->
+                    <form th:action="@{/buscarAlojamientos}" th:object="${busquedaForm}" method="get" id="busquedaForm" class="mb-4">
+
+                        <div class="mb-3 row">
+                            <label for="ubicacioin" class="col-sm-2 col-form-label">Ubicación</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="ubicacion" th:field="*{ubicacion}"  />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="personas" class="col-sm-2 col-form-label">Personas</label>
+                            <div class="col-sm-10">
+                                <input type="number" class="form-control" id="personas" th:field="*{personas}" min="1" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Fechas</label>
+                            <div class="col-sm-10 d-flex gap-2">
+
+                                <!-- Fecha de inicio -->
+                                <div id="fechaInicioInput" class="input-group date w-50">
+                                    <input type="text" class="form-control" id="fechaInicio"
+                                        th:field="*{fechaInicio}" autocomplete="off">
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                </div>
+
+                                <!-- Fecha de fin -->
+                                <div id="fechaFinInput" class="input-group date w-50">
+                                    <input type="text" class="form-control" id="fechaFin"
+                                        th:field="*{fechaFin}" autocomplete="off">
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- MAPA -->
+            <div id="map" style="height: 400px; border-radius: 10px; margin-top: 20px;"></div>
+
+
+            <!-- LISTADO -->
+            <div id="resultados" class="row gy-3">
+                <div class="col-md-4 mb-3" th:each="alojamiento : ${resultados}">
+                    <div class="card">
+                        <img th:src="@{${alojamiento.foto}}" class="card-img-top" alt="Foto de alojamiento">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${alojamiento.nombre}">Nombre</h5>
+                            <p class="card-text" th:text="${alojamiento.direccion}">Ubicación</p>
+                            <p class="card-text">Capacidad: <span th:text="${alojamiento.capacidad}">0</span> personas</p>
+                            <a th:href="@{'/reservar/' + ${alojamiento.id}}" class="btn btn-verde">RESERVAR</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+    <script th:inline="javascript">
+        /* <![CDATA[ */
+        const map = L.map('map').setView([43.36, -5.85], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let markers = L.featureGroup().addTo(map);
+
+        // Función para convertir fechas de dd/MM/yyyy a yyyy-MM-dd
+        function parseFecha(fecha) {
+            if (!fecha) return null;
+            const [dia, mes, anio] = fecha.split('/');
+            return `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+        }
+
+        // Función para pintar alojamientos en el mapa y listado
+        function pintarAlojamientos(alojamientos) {
+            markers.clearLayers();
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '';
+
+            alojamientos.forEach(a => {
+                const lat = parseFloat(a.latitud);
+                const lon = parseFloat(a.longitud);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    const marker = L.marker([lat, lon])
+                    .bindPopup(`
+                        <div class="card" style="width: 200px;">
+                            <img src="${a.foto}" class="card-img-top" alt="Foto de alojamiento" style="height:120px; object-fit:cover;">
+                            <div class="card-body text-center p-2">
+                                <h6 class="card-title mb-1">${a.nombre}</h6>
+                                <p class="card-text mb-2">Capacidad: ${a.capacidad} personas</p>
+                                <a href="/reservar/${a.id}" class="btn btn-success btn-sm w-100">RESERVAR</a>
+                            </div>
+                        </div>
+                    `);
+                    markers.addLayer(marker);
+                }
+
+                // Listado HTML
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                card.innerHTML = `
+                    <div class="card">
+                        <img src="${a.foto}" class="card-img-top" alt="Foto de alojamiento">
+                        <div class="card-body">
+                            <h5 class="card-title">${a.nombre}</h5>
+                            <p class="card-text">${a.direccion}</p>
+                            <p class="card-text">Capacidad: ${a.capacidad} personas</p>
+                            <a href="/reservar/${a.id}" class="btn btn-success btn-sm w-100">RESERVAR</a>
+                        </div>
+                    </div>
+                `;
+                resultadosDiv.appendChild(card);
+            });
+
+            if (alojamientos.length > 0) {
+                map.fitBounds(markers.getBounds().pad(0.2));
+            }
+        }
+
+        // Cargar todos los alojamientos al inicio
+        fetch('/api/alojamientos')
+            .then(res => res.json())
+            .then(alojamientos => pintarAlojamientos(alojamientos));
+
+        // Evento del formulario para filtrar
+        const form = document.getElementById('busquedaForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                ubicacion: document.getElementById('ubicacion').value || null,
+                personas: parseInt(document.getElementById('personas').value) || null,
+                fechaInicio: parseFecha(document.getElementById('fechaInicio').value),
+                fechaFin: parseFecha(document.getElementById('fechaFin').value)
+            };
+
+            fetch('/api/alojamientos/buscar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(alojamientos => pintarAlojamientos(alojamientos));
+        });
+
+        // Inicializar Tempus Dominus para fechas de búsqueda
+        const fechaInicioInput = document.getElementById('fechaInicio');
+        const fechaFinInput = document.getElementById('fechaFin');
+
+        const hoy = new Date();
+        hoy.setHours(0,0,0,0);
+
+        const tdFechaInicio = new tempusDominus.TempusDominus(fechaInicioInput, {
+            localization: { locale: 'es', format: 'dd/MM/yyyy' },
+            restrictions: { minDate: hoy }
+        });
+
+        const tdFechaFin = new tempusDominus.TempusDominus(fechaFinInput, {
+            localization: { locale: 'es', format: 'dd/MM/yyyy' },
+            restrictions: { minDate: hoy }
+        });
+
+        // Mantener inputs sincronizados con la selección del calendario
+        // Evitar que fechaFin sea anterior a fechaInicio
+        tdFechaInicio.subscribe('change.td', e => {
+            if (e.date) {
+                fechaInicioInput.value = e.date.toLocaleDateString('es-ES');
+
+                // Actualizamos la fecha mínima de fechaFin
+                tdFechaFin.updateOptions({ restrictions: { minDate: e.date } });
+
+                // Si la fechaFin actual es menor, la borramos
+                const fechaFinActual = new Date(fechaFinInput.value.split('/').reverse().join('-'));
+                if (fechaFinInput.value && fechaFinActual < e.date) {
+                    fechaFinInput.value = '';
+                }
+            }
+        });
+
+        tdFechaFin.subscribe('change.td', e => {
+            if(e.date) fechaFinInput.value = e.date.toLocaleDateString('es-ES');
+        });
+
+        /* ]]> */
+    </script>
+</body>
+</html>
