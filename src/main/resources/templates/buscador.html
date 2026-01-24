@@ -80,7 +80,7 @@
                             <h5 class="card-title" th:text="${alojamiento.nombre}">Nombre</h5>
                             <p class="card-text" th:text="${alojamiento.direccion}">Ubicación</p>
                             <p class="card-text">Capacidad: <span th:text="${alojamiento.capacidad}">0</span> personas</p>
-                            <a th:href="@{'/reservar/' + ${alojamiento.id}}" class="btn btn-verde">RESERVAR</a>
+                            <a th:href="@{'/reservar/' + ${alojamiento.id}}" class="btn btn-verde">Solicitar Reserva</a>
                         </div>
                     </div>
                 </div>

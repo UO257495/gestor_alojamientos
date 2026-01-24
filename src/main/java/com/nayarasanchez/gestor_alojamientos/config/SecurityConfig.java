@@ -55,13 +55,26 @@ public class SecurityConfig {
         http.logout(logout -> logout
             .permitAll());
 
+        // Página de acceso denegado (403)
+        http.exceptionHandling(ex -> ex
+            .accessDeniedPage("/error/403")
+        );
+
         // Las reglas más específicas necesitan estar primero, seguidas por las más generales
         http.authorizeHttpRequests(authorize -> authorize
-            // Recursos públicos
+            // Recursos públicos (estáticos)
             .requestMatchers("/css/**", "/img/**", "/fontawesome/**", "/js/**").permitAll()
-            // Rutas accesibles sin sesión
-            .requestMatchers("/inicio", "/login", "/registro", "/auth/**","/gestion/usuarios/detalle", "/gestion/usuarios/nuevo").permitAll()
-            // Todo lo demás requiere autenticación
+
+            // Públicos (login/registro)
+            .requestMatchers("/inicio", "/login", "/registro", "/auth/**").permitAll()
+
+             // Perfil usuario y admin
+            .requestMatchers("/gestion/usuarios/perfil").hasAnyRole("USUARIO", "ADMIN")
+
+            // Perfil admin
+            .requestMatchers("/gestion/usuarios/**").hasRole("ADMIN")
+
+            // lo demás requiere autenticación
             .anyRequest().authenticated()
         );
 
