@@ -68,10 +68,7 @@ public class SecurityConfig {
             // Públicos (login/registro)
             .requestMatchers("/inicio", "/login", "/registro", "/auth/**").permitAll()
 
-             // Perfil usuario y admin
-            .requestMatchers("/gestion/usuarios/perfil").hasAnyRole("USUARIO", "ADMIN")
-
-            // Perfil admin
+            .requestMatchers("/gestion/usuarios/perfil").authenticated()
             .requestMatchers("/gestion/usuarios/**").hasRole("ADMIN")
 
             // lo demás requiere autenticación

@@ -14,7 +14,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     // Buscar reservas por cliente, alojamiento, fechas, etc., si lo necesitas:
     List<Reserva> findByAlojamientoId(Long alojamientoId);
 
-    List<Reserva> findByClienteId(Long clienteId);
+    List<Reserva> findByClienteIdOrderByIdDesc(Long clienteId);
 
     List<Reserva> findByAlojamientoIdAndEstadoNotIn(Long alojamientoId, List<EstadoReserva> estados);
 

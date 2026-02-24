@@ -56,7 +56,7 @@ public class ReservaService {
      * Busca un reserva por email del cliente
      */
     public List<Reserva> buscarPorClienteId(Long id) {
-        return reservaRepository.findByClienteId(id);
+        return reservaRepository.findByClienteIdOrderByIdDesc(id);
     }
 
     

@@ -44,10 +44,13 @@ public class GestionUsuariosController {
 
     @GetMapping("/detalle")
     public String detalle(@RequestParam("id") Optional<Long> id, Model model) {
+
         Usuario usuario = id.flatMap(usuarioService::obtenerUsuarioPorId).orElse(new Usuario());
         model.addAttribute("usuario", usuario);
         model.addAttribute("roles", Rol.values());
         model.addAttribute("soloLecturaRoles", false);
+        model.addAttribute("modoPerfil", false);
+
         return "gestion/usuarios/detalle";
     }
 
@@ -96,32 +99,38 @@ public class GestionUsuariosController {
 
     @PostMapping("/editar")
     public String editar(@RequestParam("password") String password,
-                         @RequestParam("confirmarPassword") String confirmarPassword,
-                         @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
-                         BindingResult result, Model model, Locale locale,
-                         RedirectAttributes redirectAttributes) {
+                        @RequestParam("confirmarPassword") String confirmarPassword,
+                        @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
+                        BindingResult result, Model model, Locale locale,
+                        RedirectAttributes redirectAttributes) {
 
-        if (result.hasErrors() || (!password.isEmpty() && !password.equals(confirmarPassword))) {
+        if (result.hasErrors()) {
             model.addAttribute("roles", Rol.values());
-            model.addAttribute("mensajeUsuario",
-                MensajeUsuario.mensajeError(!password.isEmpty() && !password.equals(confirmarPassword)
-                    ? messageSource.getMessage("validation.password.no-iguales", null, locale)
-                    : messageSource.getMessage("validation.password.no-calidad", null, locale)));
             return "gestion/usuarios/detalle";
+        }
+
+        // password opcional
+        if (!password.isBlank()) {
+            if (!password.equals(confirmarPassword)) {
+                model.addAttribute("roles", Rol.values());
+                model.addAttribute("mensajeUsuario",
+                    MensajeUsuario.mensajeError(messageSource.getMessage("validation.password.no-iguales", null, locale)));
+                return "gestion/usuarios/detalle";
+            }
+
+            if (!usuarioService.comprobarPoliticaCalidadPassword(password)) {
+                model.addAttribute("roles", Rol.values());
+                model.addAttribute("mensajeUsuario",
+                    MensajeUsuario.mensajeError(messageSource.getMessage("validation.password.no-calidad", null, locale)));
+                return "gestion/usuarios/detalle";
+            }
         }
 
         Usuario usuarioExistente = usuarioService.obtenerUsuarioPorId(usuarioForm.getId()).orElseThrow();
-        if (!password.isEmpty() && !usuarioService.comprobarPoliticaCalidadPassword(password)) {
-            model.addAttribute("roles", Rol.values());
-            model.addAttribute("mensajeUsuario",
-                MensajeUsuario.mensajeError(messageSource.getMessage("validation.password.no-calidad", null, locale)));
-            return "gestion/usuarios/detalle";
-        }
+        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password); // si password vacío, tu service debe ignorarla
 
-        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password);
-
-        redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
-                messageSource.getMessage("formulario.guardado", null, locale)));
+        redirectAttributes.addFlashAttribute("mensajeUsuario",
+            MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.guardado", null, locale)));
 
         return "redirect:/gestion/usuarios/detalle?id=" + usuarioExistente.getId();
     }
@@ -134,13 +143,68 @@ public class GestionUsuariosController {
 
     @GetMapping("/perfil")
     public String perfil(Model model, Authentication auth) {
-        String email = auth.getName(); 
+
+        String email = auth.getName();
         Usuario usuario = usuarioService.obtenerUsuarioPorEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         model.addAttribute("usuario", usuario);
         model.addAttribute("soloLecturaRoles", true);
-        return "gestion/usuarios/detalle"; 
+        model.addAttribute("modoPerfil", true);
+
+        return "gestion/usuarios/detalle";
     }
 
-    
+    @PostMapping("/perfil")
+    public String guardarPerfil(@RequestParam("password") String password,
+                                @RequestParam("confirmarPassword") String confirmarPassword,
+                                @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
+                                BindingResult result, Model model, Locale locale,
+                                RedirectAttributes redirectAttributes,
+                                Authentication auth) {
+
+        Usuario usuarioActual = usuarioService.obtenerUsuarioPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (result.hasErrors()) {
+            model.addAttribute("usuario", usuarioActual);
+            model.addAttribute("soloLecturaRoles", true);
+            model.addAttribute("modoPerfil", true);
+            model.addAttribute("mensajeUsuario",
+            MensajeUsuario.mensajeError("Revisa los campos del formulario"));
+            return "gestion/usuarios/detalle";
+        }
+
+        // password opcional
+        if (!password.isBlank()) {
+            if (!password.equals(confirmarPassword)) {
+                model.addAttribute("usuario", usuarioActual);
+                model.addAttribute("soloLecturaRoles", true);
+                model.addAttribute("modoPerfil", true);
+                model.addAttribute("mensajeUsuario",
+                    MensajeUsuario.mensajeError(messageSource.getMessage("validation.password.no-iguales", null, locale)));
+                return "gestion/usuarios/detalle";
+            }
+
+            if (!usuarioService.comprobarPoliticaCalidadPassword(password)) {
+                model.addAttribute("usuario", usuarioActual);
+                model.addAttribute("soloLecturaRoles", true);
+                model.addAttribute("modoPerfil", true);
+                model.addAttribute("mensajeUsuario",
+                    MensajeUsuario.mensajeError(messageSource.getMessage("validation.password.no-calidad", null, locale)));
+                return "gestion/usuarios/detalle";
+            }
+        }
+
+        usuarioForm.setId(usuarioActual.getId());
+        usuarioForm.setEmail(usuarioActual.getEmail());
+
+        usuarioService.editarUsuario(usuarioActual, usuarioForm, password);
+
+        redirectAttributes.addFlashAttribute("mensajeUsuario",
+            MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.guardado", null, locale)));
+
+        return "redirect:/gestion/usuarios/perfil";
+    }
+
 }

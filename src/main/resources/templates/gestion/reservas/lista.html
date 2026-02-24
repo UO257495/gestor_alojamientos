@@ -15,7 +15,7 @@
             th:href="@{/gestion/reservas/detalle}"><i class="fa-solid fa-plus"></i></a>
         </h1>
 
-        <div th:replace="~{fragments/mensajes :: mensajes-alerta (mensajeUsuario=${mensajeUsuario})}"></div>
+        <div th:replace="~{fragments/mensajes :: mensajes-alerta(mensajeUsuario=${mensajeUsuario})}"></div>
         
         <table id="tablaReservas" class="table table-sm table-striped table-hover" style="width:100%">
             <thead>

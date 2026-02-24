@@ -3,7 +3,6 @@ package com.nayarasanchez.gestor_alojamientos.dto.form;
 import com.nayarasanchez.gestor_alojamientos.model.Rol;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +28,6 @@ public class UsuarioForm {
     @NotBlank(message = "{validation.obligatorio}")
     private String email;
 
-    @NotBlank(message = "{validation.obligatorio}")
     private String password;
 
 }

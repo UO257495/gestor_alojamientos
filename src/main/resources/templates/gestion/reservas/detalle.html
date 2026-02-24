@@ -70,7 +70,8 @@
                             </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <!-- FECHA INICIO (editable: ADMIN/PROPIETARIO) -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
                         <label class="col-sm-2 col-form-label">Fecha Inicio <span class="text-danger">*</span></label>
                         <div class="col-sm-4">
                             <div id="fechaInicio" class="input-group" data-td-target-input="nearest" data-td-target-toggle="nearest">
@@ -83,7 +84,16 @@
                         </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <!-- FECHA INICIO (solo lectura: CLIENTE) -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                        <label class="col-sm-2 col-form-label">Fecha Inicio</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control"
+                                th:value="${reserva.fechaInicio}" readonly />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">
                         <label class="col-sm-2 col-form-label">Fecha Fin <span class="text-danger">*</span></label>
                         <div class="col-sm-4">
                             <div id="fechaFin" class="input-group" data-td-target-input="nearest" data-td-target-toggle="nearest">
@@ -96,6 +106,15 @@
                         </div>
                     </div>
 
+                    <!-- FECHA FIN (solo lectura: CLIENTE) -->
+                    <div class="mb-3 row" th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                        <label class="col-sm-2 col-form-label">Fecha Fin</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control"
+                                th:value="${reserva.fechaFin}" readonly />
+                        </div>
+                    </div>
+                    
                     <!-- Solo para creación.  -->
                     <div class="mb-3 row" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')') and reserva.id == null}">
                         <label class="col-sm-2 col-form-label">Estado</label>
@@ -217,7 +236,7 @@
                         th:href="@{/valoraciones/nueva/{id}(id=${reserva.id})}">
                         Dejar Valoración
                         </a>
-                        <button type="submit" class="btn btn-success ms-2">Guardar</button>
+                        <button type="submit" class="btn btn-success ms-2" th:if="${#authorization.expression('hasAnyRole(''PROPIETARIO'', ''ADMIN'')')}">Guardar</button>
                         <a class="btn btn-outline-secondary ms-2" th:href="@{/gestion/reservas/lista}">Cerrar</a>
                     </div>
                     
