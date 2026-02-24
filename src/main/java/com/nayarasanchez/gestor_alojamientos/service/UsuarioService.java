@@ -127,9 +127,11 @@ public class UsuarioService {
         usuarioExistente.setDni(form.getDni());
         usuarioExistente.setTelefono(form.getTelefono());
         usuarioExistente.setRol(form.getRol());
-        if (password != null && !password.isEmpty()) {
+        if (password != null && !password.isBlank()) {
             usuarioExistente.setPassword(passwordEncoder.encode(password));
-        }
+         }else{
+            usuarioExistente.setPassword(usuarioExistente.getPassword());
+         }
         return usuarioRepository.save(usuarioExistente);
     }
 }

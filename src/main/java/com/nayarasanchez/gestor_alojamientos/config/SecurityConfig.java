@@ -69,7 +69,7 @@ public class SecurityConfig {
             .requestMatchers("/inicio", "/login", "/registro", "/auth/**").permitAll()
 
             .requestMatchers("/gestion/usuarios/perfil").authenticated()
-            .requestMatchers("/gestion/usuarios/**").hasRole("ADMIN")
+            
 
             // lo demás requiere autenticación
             .anyRequest().authenticated()
