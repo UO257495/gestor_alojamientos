@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    
     //-------------------------------------------------------------------------------------------------
     // Elementos
     //-------------------------------------------------------------------------------------------------
@@ -8,11 +9,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const fechaInicioInput = document.getElementById("fechaInicioInput");
     const fechaFinInput = document.getElementById("fechaFinInput");
     const alojamientoSelect = document.getElementById("alojamientoSelect");
+    const clienteSelect = document.getElementById('clienteSelect');
     const totalInput = document.getElementById("totalInput");
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
     let fechasOcupadas = []; // lista de intervalos ocupados
+
+    //-------------------------------------------------------------------------------------------------
+    // Buscadores Mejorados (Tom Select)
+    //-------------------------------------------------------------------------------------------------
+    
+    if (clienteSelect) {
+        new TomSelect(clienteSelect, {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: "Escribe para buscar un cliente..."
+        });
+    }
+
+    if (alojamientoSelect) {
+        new TomSelect(alojamientoSelect, {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: "Escribe para buscar un alojamiento..."
+        });
+    }
 
     //-------------------------------------------------------------------------------------------------
     // Fechas Tempus Dominus

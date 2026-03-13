@@ -141,15 +141,29 @@
         ? dataOcupacionMensual.values[dataOcupacionMensual.labels.indexOf(m)] 
         : 0
     );
+    
     chartOcupacionMensual.setOption({
         xAxis: { type: 'category', data: meses },
         yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value} %' } },
-        tooltip: { trigger: 'axis', formatter: function(params){ return params[0].axisValue + ': ' + params[0].data + ' %'; } },
+        tooltip: { 
+            trigger: 'axis', 
+            formatter: function(params){ 
+                // Redondeamos a 2 decimales en el recuadro negro al pasar el ratón
+                return params[0].axisValue + ': ' + Number(params[0].data).toFixed(2) + ' %'; 
+            } 
+        },
         series: [{
             data: ocupacionCompletos,
             type: 'line',
             smooth: true,
-            label: { show: true, position: 'top', formatter: '{c} %' }
+            label: { 
+                show: true, 
+                position: 'top', 
+                formatter: function(params) {
+                    // Redondeamos a 2 decimales en el número que sale encima de la línea
+                    return Number(params.data).toFixed(2) + ' %';
+                } 
+            }
         }]
     });
 </script>

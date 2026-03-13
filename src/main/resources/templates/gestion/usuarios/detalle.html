@@ -82,7 +82,8 @@
                                 id="password"
                                 th:field="*{password}"
                                 th:attr="required=${usuario.id == null}"
-                                autocomplete="new-password"/>
+                                autocomplete="new-password"
+                                th:placeholder="${usuario.id != null ? 'Déjalo en blanco para mantener la contraseña actual' : ''}"/>
                             <div class="form-text" th:text="#{validation.password.politica}"></div>
                         </div>
                     </div>
@@ -98,7 +99,8 @@
                                 id="confirmarPassword"
                                 name="confirmarPassword"
                                 th:attr="required=${usuario.id == null}"
-                                autocomplete="new-password"/>
+                                autocomplete="new-password"
+                                th:placeholder="${usuario.id != null ? 'Déjalo en blanco para mantener la contraseña actual' : ''}"/>
                         </div>
                     </div>
 

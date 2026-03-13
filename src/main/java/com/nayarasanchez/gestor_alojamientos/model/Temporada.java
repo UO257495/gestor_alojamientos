@@ -2,6 +2,8 @@ package com.nayarasanchez.gestor_alojamientos.model;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -12,9 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
@@ -31,9 +31,11 @@ public class Temporada {
     private String nombre; 
 
     @Column(name = "fecha_inicio", nullable = false)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin", nullable = false)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate fechaFin;
 
     @Column(nullable = false)

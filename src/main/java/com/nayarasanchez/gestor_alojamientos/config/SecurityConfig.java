@@ -53,6 +53,7 @@ public class SecurityConfig {
         );
 
         http.logout(logout -> logout
+            .logoutSuccessUrl("/inicio")
             .permitAll());
 
         // Página de acceso denegado (403)
@@ -66,7 +67,7 @@ public class SecurityConfig {
             .requestMatchers("/css/**", "/img/**", "/fontawesome/**", "/js/**").permitAll()
 
             // Públicos (login/registro)
-            .requestMatchers("/inicio", "/login", "/registro", "/auth/**").permitAll()
+            .requestMatchers("/inicio", "/login", "/registro", "/auth/**", "/gestion/usuarios/nuevo").permitAll()
 
             .requestMatchers("/gestion/usuarios/perfil").authenticated()
             

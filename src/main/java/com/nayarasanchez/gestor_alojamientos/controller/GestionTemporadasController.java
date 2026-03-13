@@ -47,8 +47,8 @@ public class GestionTemporadasController {
         return "gestion/temporadas/detalle";
     }
     
-    @PostMapping("/nuevo")
-    public String nuevo(@Valid @ModelAttribute("temporada") TemporadaForm temporadaForm,
+    @PostMapping({"/nuevo", "/editar"})
+    public String guardar(@Valid @ModelAttribute("temporada") TemporadaForm temporadaForm,
                         BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
@@ -58,11 +58,23 @@ public class GestionTemporadasController {
         
          try {
             temporadaService.crearOActualizar(temporadaForm);
-            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto("Temporada guardada correctamente"));
+            
+            String mensaje = (temporadaForm.getId() == null) 
+                ? "Temporada creada correctamente" 
+                : "Temporada actualizada correctamente";
+                
+            redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(mensaje));
             return "redirect:/gestion/temporadas/lista";
+            
+         } catch (IllegalArgumentException e) {
+            model.addAttribute("alojamientos", alojamientoService.listarTodos());
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError(e.getMessage()));
+            return "gestion/temporadas/detalle";
+            
          } catch (Exception e) {
-            model.addAttribute("mensajeUsuario", "Error guardando el alojamiento");
-            return "gestion/alojamientos/detalle";
+            model.addAttribute("alojamientos", alojamientoService.listarTodos());
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Error guardando la temporada"));
+            return "gestion/temporadas/detalle";
         }
     }
 

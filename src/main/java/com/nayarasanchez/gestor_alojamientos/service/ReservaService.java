@@ -188,10 +188,11 @@ public class ReservaService {
     }
 
     /**
-     * Calcula el precio total de una reserva según las fechas y el alojamiento.
+     * Calcula el precio total de una reserva por NOCHES según las fechas y el alojamiento.
      */
     public double calcularTotal(Long alojamientoId, LocalDate inicio, LocalDate fin) {
-        if (alojamientoId == null || inicio == null || fin == null || fin.isBefore(inicio)) {
+        // Validación básica de fechas
+        if (alojamientoId == null || inicio == null || fin == null || !fin.isAfter(inicio)) {
             return 0.0;
         }
 
@@ -200,15 +201,18 @@ public class ReservaService {
 
         double precioBase = alojamiento.getTarifaBase(); 
 
-        // Buscar la temporada activa en esas fechas
         Double precioTemporada = temporadaRepository
                 .findPrecioPorFechasYAlojamiento(inicio, fin, alojamientoId)
                 .orElse(0.0);
 
-        long dias = ChronoUnit.DAYS.between(inicio, fin);
-        if (dias <= 0) dias = 1; // al menos 1 día
+        // ChronoUnit.DAYS.between(inicio, fin) es exactamente el número de NOCHES
+        // Ej: del 10 al 12 hay 2 días (noches del 10 y del 11).
+        long noches = ChronoUnit.DAYS.between(inicio, fin);
 
-        return (precioBase + precioTemporada) * dias;
+        // Protegemos para que al menos sea 1 noche
+        if (noches <= 0) noches = 1;
+
+        return (precioBase + precioTemporada) * noches;
     }
 
     public List<Reserva> findFechasOcupadas(Long alojamientoId) {

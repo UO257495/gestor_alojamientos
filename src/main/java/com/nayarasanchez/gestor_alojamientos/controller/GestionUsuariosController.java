@@ -54,6 +54,25 @@ public class GestionUsuariosController {
         return "gestion/usuarios/detalle";
     }
 
+
+    @GetMapping("/nuevo")
+    public String mostrarFormularioRegistro(Model model, Authentication auth) {
+        Usuario usuario = new Usuario();
+        
+        // Si es un usuario anónimo (no logueado), le preasignamos el rol CLIENTE
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            usuario.setRol(Rol.CLIENTE);
+        }
+
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("roles", Rol.values());
+        // Lo dejamos a false, el HTML ya se encarga de ocultarlo con sec:authorize si no es ADMIN/PROPIETARIO
+        model.addAttribute("soloLecturaRoles", false); 
+        model.addAttribute("modoPerfil", false);
+
+        return "gestion/usuarios/detalle";
+    }
+
     @PostMapping("/nuevo")
     public String nuevo(@RequestParam("password") String password,
                         @RequestParam("confirmarPassword") String confirmarPassword,
@@ -84,16 +103,16 @@ public class GestionUsuariosController {
             return "gestion/usuarios/detalle";
         }
 
-        Usuario usuario = usuarioService.crearUsuario(usuarioForm, password, auth);
+        usuarioService.crearUsuario(usuarioForm, password, auth);
         if(auth == null){
             redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
                 messageSource.getMessage("creacion.usuario.cliente", null, locale)));
                 return "redirect:/login";
         } else{
             redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(
-                    messageSource.getMessage("formulario.guardado", null, locale)));
+                    messageSource.getMessage("formulario.nuevo.usuario", null, locale)));
             
-            return "redirect:/gestion/usuarios/detalle?id=" + usuario.getId();
+            return "redirect:/gestion/usuarios/lista";
         }
     }
 
@@ -127,12 +146,12 @@ public class GestionUsuariosController {
         }
 
         Usuario usuarioExistente = usuarioService.obtenerUsuarioPorId(usuarioForm.getId()).orElseThrow();
-        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password); // si password vacío, tu service debe ignorarla
+        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password); // si password vacío, el service debe ignorarla
 
         redirectAttributes.addFlashAttribute("mensajeUsuario",
-            MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.guardado", null, locale)));
+            MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.usuario.modificado", null, locale)));
 
-        return "redirect:/gestion/usuarios/detalle?id=" + usuarioExistente.getId();
+       return "redirect:/gestion/usuarios/lista";
     }
 
     @GetMapping("/eliminar")
