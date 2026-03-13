@@ -134,4 +134,9 @@ public class UsuarioService {
          }
         return usuarioRepository.save(usuarioExistente);
     }
+
+    public boolean comprobarDniEnUso(String dni) {
+        return usuarioRepository.existsByDni(dni);
+    }
+    
 }

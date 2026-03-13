@@ -80,6 +80,10 @@ public class GestionUsuariosController {
                         BindingResult result, Model model, Locale locale,
                         RedirectAttributes redirectAttributes, Authentication auth) {
 
+        if (usuarioService.comprobarDniEnUso(usuarioForm.getDni())) {
+            result.rejectValue("dni", "error.usuario", "Ya existe un usuario registrado con este DNI.");
+        }
+
         if (result.hasErrors() || !password.equals(confirmarPassword)) {
             model.addAttribute("roles", Rol.values());
             model.addAttribute("mensajeUsuario",
@@ -122,6 +126,10 @@ public class GestionUsuariosController {
                         @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
                         BindingResult result, Model model, Locale locale,
                         RedirectAttributes redirectAttributes) {
+
+        if (usuarioService.comprobarDniEnUso(usuarioForm.getDni())) {
+            result.rejectValue("dni", "error.usuario", "Ya existe un usuario registrado con este DNI.");
+        }
 
         if (result.hasErrors()) {
             model.addAttribute("roles", Rol.values());
