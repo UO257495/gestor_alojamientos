@@ -190,8 +190,11 @@ public class ReservaService {
     /**
      * Calcula el precio total de una reserva por NOCHES según las fechas y el alojamiento.
      */
+    /**
+     * Calcula el precio total de una reserva calculando NOCHE a NOCHE.
+     */
     public double calcularTotal(Long alojamientoId, LocalDate inicio, LocalDate fin) {
-        // Validación básica de fechas
+        // Validación: El check-out debe ser posterior al check-in
         if (alojamientoId == null || inicio == null || fin == null || !fin.isAfter(inicio)) {
             return 0.0;
         }
@@ -200,19 +203,22 @@ public class ReservaService {
                 .orElseThrow(() -> new IllegalArgumentException("Alojamiento no encontrado"));
 
         double precioBase = alojamiento.getTarifaBase(); 
+        double precioTotal = 0.0;
 
-        Double precioTemporada = temporadaRepository
-                .findPrecioPorFechasYAlojamiento(inicio, fin, alojamientoId)
-                .orElse(0.0);
+        // Iteramos desde el check-in hasta el día ANTES del check-out
+        for (LocalDate noche = inicio; noche.isBefore(fin); noche = noche.plusDays(1)) {
+            
+            // Buscamos si ESA noche en concreto tiene precio de temporada
+            // Al pasar (noche, noche), el repositorio busca si esa fecha exacta cae en temporada
+            Double precioTemporada = temporadaRepository
+                    .findPrecioPorFechasYAlojamiento(noche, noche, alojamientoId)
+                    .orElse(0.0);
 
-        // ChronoUnit.DAYS.between(inicio, fin) es exactamente el número de NOCHES
-        // Ej: del 10 al 12 hay 2 días (noches del 10 y del 11).
-        long noches = ChronoUnit.DAYS.between(inicio, fin);
+            // Sumamos la noche al total
+            precioTotal += (precioBase + precioTemporada);
+        }
 
-        // Protegemos para que al menos sea 1 noche
-        if (noches <= 0) noches = 1;
-
-        return (precioBase + precioTemporada) * noches;
+        return precioTotal;
     }
 
     public List<Reserva> findFechasOcupadas(Long alojamientoId) {
@@ -245,38 +251,32 @@ public class ReservaService {
                     YearMonth ym = YearMonth.of(anio, mes);
                     int diasMes = ym.lengthOfMonth();
 
-                    // Map para contar ocupación por día
+                    // Inicializamos todos los días del mes a 0 ocupación
                     Map<LocalDate, Long> ocupacionPorDia = IntStream.rangeClosed(1, diasMes)
-                            .mapToObj(d -> ym.atDay(d))
+                            .mapToObj(ym::atDay)
                             .collect(Collectors.toMap(d -> d, d -> 0L));
 
                     for (Reserva r : reservas) {
-                        LocalDate inicioReserva = r.getFechaInicio();
-                        LocalDate finReserva = r.getFechaFin();
-
-                        // Ajustamos la reserva para que solo cuente dentro del mes
-                        LocalDate inicio = inicioReserva.isBefore(ym.atDay(1)) ? ym.atDay(1) : inicioReserva;
-                        LocalDate fin = finReserva.isAfter(ym.atEndOfMonth()) ? ym.atEndOfMonth() : finReserva;
-
-                        if (!fin.isBefore(inicio)) {
-                            for (LocalDate d = inicio; !d.isAfter(fin); d = d.plusDays(1)) {
-                                ocupacionPorDia.put(d, ocupacionPorDia.get(d) + 1);
+                        // Iteramos noche a noche (usando isBefore excluye el día de salida)
+                        for (LocalDate noche = r.getFechaInicio(); noche.isBefore(r.getFechaFin()); noche = noche.plusDays(1)) {
+                            
+                            // Si la noche en la que duerme cae en el mes y año que estamos calculando, la contamos
+                            if (noche.getMonthValue() == mes && noche.getYear() == anio) {
+                                ocupacionPorDia.put(noche, ocupacionPorDia.get(noche) + 1);
                             }
                         }
                     }
 
-                    // Calculamos el promedio de ocupación diaria en porcentaje
-                    double ocupacionTotal = ocupacionPorDia.values().stream()
+                    // Calculamos el promedio de ocupación de esas noches en porcentaje
+                    if (totalAlojamientos == 0) return 0.0; // Evitar división por cero
+                    
+                    return ocupacionPorDia.values().stream()
                             .mapToDouble(c -> (c * 100.0) / totalAlojamientos)
                             .average()
                             .orElse(0.0);
-
-                    return ocupacionTotal;
                 }
             ));
     }
-
-
 
 
 }

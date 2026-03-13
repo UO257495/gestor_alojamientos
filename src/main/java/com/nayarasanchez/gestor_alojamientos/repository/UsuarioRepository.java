@@ -22,4 +22,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
     public List<Usuario> findAllByRol(Rol cliente);
 
     boolean existsByDni(String dni);
+
+    Optional<Usuario> findByDni(String dni);
 }

@@ -139,4 +139,24 @@ public class UsuarioService {
         return usuarioRepository.existsByDni(dni);
     }
     
+    /**
+     * Comprueba si un DNI ya está registrado.
+     * Si pasamos un ID (modo edición), ignora a ese mismo usuario para que no "choque" consigo mismo.
+     */
+    public boolean comprobarDniEnUso(String dni, Long idUsuarioActual) {
+        Optional<Usuario> usuarioEnBD = usuarioRepository.findByDni(dni);
+        
+        if (usuarioEnBD.isPresent()) {
+            // Si el ID del usuario que encontramos es distinto al que estamos editando...
+            if (idUsuarioActual != null && !usuarioEnBD.get().getId().equals(idUsuarioActual)) {
+                return true; // El DNI lo está usando OTRA persona. ¡Error!
+            }
+            // Si estamos creando un usuario nuevo (ID es null), entonces sí es un error
+            if (idUsuarioActual == null) {
+                return true;
+            }
+        }
+        // Si llegamos aquí, el DNI está libre o es el suyo propio
+        return false;
+    }
 }

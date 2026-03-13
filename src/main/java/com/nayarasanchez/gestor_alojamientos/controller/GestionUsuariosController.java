@@ -127,15 +127,17 @@ public class GestionUsuariosController {
                         BindingResult result, Model model, Locale locale,
                         RedirectAttributes redirectAttributes) {
 
-        if (usuarioService.comprobarDniEnUso(usuarioForm.getDni())) {
-            result.rejectValue("dni", "error.usuario", "Ya existe un usuario registrado con este DNI.");
-        }
-
         if (result.hasErrors()) {
             model.addAttribute("roles", Rol.values());
             return "gestion/usuarios/detalle";
         }
 
+        if (usuarioService.comprobarDniEnUso(usuarioForm.getDni(), usuarioForm.getId())) {
+            model.addAttribute("roles", Rol.values());
+            model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Ese DNI ya está registrado en otro usuario."));
+            return "gestion/usuarios/detalle";
+        }
+        
         // password opcional
         if (!password.isBlank()) {
             if (!password.equals(confirmarPassword)) {
