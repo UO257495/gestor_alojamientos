@@ -1,10 +1,9 @@
-package com.nayarasanchez.gestor_alojamientos.config;
+package com.nayarasanchez.gestor_alojamientos.cucumber;
 
-import org.springframework.boot.test.context.SpringBootTest;
 import io.cucumber.spring.CucumberContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @CucumberContextConfiguration
 @SpringBootTest
 public class CucumberSpringConfig {
-    
 }

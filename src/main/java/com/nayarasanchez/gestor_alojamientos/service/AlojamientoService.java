@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AlojamientoService {
 
     private final AlojamientoRepository alojamientoRepository;
-    private final S3Service s3Service;
+    @Autowired
+    private SupabaseStorageService storageService;
 
      /**
      * Lista todos los alojamientos registrados
@@ -62,10 +64,10 @@ public class AlojamientoService {
         alojamiento.setCapacidad(form.getCapacidad());
         //TODO: ASIGNAR EL PROPIETARIO REAL
 
-        // Subir foto a S3 si se ha cargado
+        // Subir foto si se ha cargado
         MultipartFile foto = form.getFoto();
         if (foto != null && !foto.isEmpty()) {
-            String url = s3Service.uploadFile(foto);
+            String url = storageService.uploadFile(foto);
             alojamiento.setFoto(url);
         }
 
@@ -83,13 +85,13 @@ public class AlojamientoService {
 
     public void eliminar(Long id) {
         alojamientoRepository.findById(id).ifPresent(alojamiento -> {
-            // Eliminar la imagen de S3 si existe
+            // Eliminar la imagen si existe
             if (alojamiento.getFoto() != null && !alojamiento.getFoto().isBlank()) {
                 try {
-                    s3Service.deleteFile(alojamiento.getFoto());
+                    storageService.deleteFile(alojamiento.getFoto());
                 } catch (Exception e) {
                     // Loguear error, pero no impedir la eliminación del registro
-                    log.error("Error al eliminar la foto de S3: " + alojamiento.getFoto(), e);
+                    log.error("Error al eliminar la foto: " + alojamiento.getFoto(), e);
                 }
             }
 

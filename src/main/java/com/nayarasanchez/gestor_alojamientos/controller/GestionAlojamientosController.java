@@ -62,6 +62,7 @@ public class GestionAlojamientosController {
             redirectAttributes.addFlashAttribute("mensajeUsuario", MensajeUsuario.mensajeCorrecto(mensaje));
             return "redirect:/gestion/alojamientos/lista";
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError("Error guardando el alojamiento"));
             return "gestion/alojamientos/detalle";
         }
