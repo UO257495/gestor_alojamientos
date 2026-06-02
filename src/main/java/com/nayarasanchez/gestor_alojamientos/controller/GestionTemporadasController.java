@@ -53,6 +53,10 @@ public class GestionTemporadasController {
 
         if (result.hasErrors()) {
             model.addAttribute("alojamientos", alojamientoService.listarTodos());
+            model.addAttribute(
+                "mensajeUsuario",
+                MensajeUsuario.mensajeError("Revisa los datos del formulario")
+            );
             return "gestion/temporadas/detalle";
         }
         

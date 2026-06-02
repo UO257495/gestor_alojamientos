@@ -72,19 +72,7 @@
 
 
             <!-- LISTADO -->
-            <div id="resultados" class="row gy-3">
-                <div class="col-md-4 mb-3" th:each="alojamiento : ${resultados}">
-                    <div class="card">
-                        <img th:src="@{${alojamiento.foto}}" class="card-img-top" alt="Foto de alojamiento">
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${alojamiento.nombre}">Nombre</h5>
-                            <p class="card-text" th:text="${alojamiento.direccion}">Ubicación</p>
-                            <p class="card-text">Capacidad: <span th:text="${alojamiento.capacidad}">0</span> personas</p>
-                            <a th:href="@{'/reservar/' + ${alojamiento.id}}" class="btn btn-verde">Solicitar Reserva</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="resultados" class="row gy-3"></div>
         </div>
 
     </section>
@@ -101,6 +89,7 @@
         }).addTo(map);
 
         let markers = L.featureGroup().addTo(map);
+        mostrarMensajeInicial();
 
         // Función para convertir fechas de dd/MM/yyyy a yyyy-MM-dd
         function parseFecha(fecha) {
@@ -109,11 +98,52 @@
             return `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
         }
 
+        function mostrarMensajeInicial() {
+            const resultadosDiv = document.getElementById('resultados');
+
+            resultadosDiv.innerHTML = `
+                <div class="col-12">
+                    <div class="card border-0 bg-light shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <i class="fa-solid fa-bed fa-3x text-secondary mb-3"></i>
+                            <h4>Busca tu alojamiento ideal</h4>
+                            <p class="text-muted mb-0">
+                                Introduce al menos un criterio de búsqueda para visualizar los alojamientos disponibles.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function mostrarSinResultados() {
+            const resultadosDiv = document.getElementById('resultados');
+
+            resultadosDiv.innerHTML = `
+                <div class="col-12">
+                    <div class="card border-warning shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <i class="fa-solid fa-magnifying-glass fa-3x text-warning mb-3"></i>
+                            <h4>No se encontraron alojamientos</h4>
+                            <p class="text-muted mb-0">
+                                No existen alojamientos que cumplan los criterios de búsqueda indicados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         // Función para pintar alojamientos en el mapa y listado
         function pintarAlojamientos(alojamientos) {
             markers.clearLayers();
             const resultadosDiv = document.getElementById('resultados');
             resultadosDiv.innerHTML = '';
+
+            if (alojamientos.length === 0) {
+                mostrarSinResultados();
+                return;
+            }
 
             alojamientos.forEach(a => {
                 const lat = parseFloat(a.latitud);
@@ -155,31 +185,37 @@
             }
         }
 
-        // Cargar todos los alojamientos al inicio
-        fetch('/api/alojamientos')
-            .then(res => res.json())
-            .then(alojamientos => pintarAlojamientos(alojamientos));
-
         // Evento del formulario para filtrar
         const form = document.getElementById('busquedaForm');
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
+        e.preventDefault();
 
-            const data = {
-                ubicacion: document.getElementById('ubicacion').value || null,
-                personas: parseInt(document.getElementById('personas').value) || null,
-                fechaInicio: parseFecha(document.getElementById('fechaInicio').value),
-                fechaFin: parseFecha(document.getElementById('fechaFin').value)
-            };
+        const ubicacion = document.getElementById('ubicacion').value.trim();
+        const personas = document.getElementById('personas').value;
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
 
-            fetch('/api/alojamientos/buscar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(alojamientos => pintarAlojamientos(alojamientos));
-        });
+        // Debe existir al menos un filtro
+        if (!ubicacion && !personas && !fechaInicio && !fechaFin) {
+            mostrarMensajeInicial();
+            return;
+        }
+
+        const data = {
+            ubicacion: ubicacion || null,
+            personas: personas ? parseInt(personas) : null,
+            fechaInicio: parseFecha(fechaInicio),
+            fechaFin: parseFecha(fechaFin)
+        };
+
+        fetch('/api/alojamientos/buscar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(alojamientos => pintarAlojamientos(alojamientos));
+    });
 
         // Inicializar Tempus Dominus para fechas de búsqueda
         const fechaInicioInput = document.getElementById('fechaInicio');

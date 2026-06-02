@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 
 @Data
@@ -21,4 +22,13 @@ public class TemporadaForm {
     private Double precio;
     
     private Long alojamiento;
+
+    @AssertTrue(message = "La fecha fin debe ser igual o posterior a la fecha de inicio")
+    public boolean isRangoFechasValido() {
+        if (fechaInicio == null || fechaFin == null) {
+            return true;
+        }
+
+        return !fechaFin.isBefore(fechaInicio);
+    }
 }

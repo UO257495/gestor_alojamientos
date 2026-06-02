@@ -35,12 +35,17 @@ public class GestionEstadisticasController {
         List<Reserva> reservas = reservaService.obtenerReservasPorAnio(year);
         List<Alojamiento> alojamientos = alojamientoService.listarTodos();
 
-        //Cálculos 
         Map<String, Long> reservasPorEstado = reservas.stream()
-            .collect(Collectors.groupingBy(r -> r.getEstado().name(), Collectors.counting()));
+            .collect(Collectors.groupingBy(
+                r -> r.getEstado() != null ? r.getEstado().name() : "SIN ESTADO",
+                Collectors.counting()
+            ));
 
         Map<String, Long> reservasPorPago = reservas.stream()
-            .collect(Collectors.groupingBy(r -> r.getFormaPago().name(), Collectors.counting()));
+            .collect(Collectors.groupingBy(
+                r -> r.getFormaPago() != null ? r.getFormaPago().name() : "SIN FORMA DE PAGO",
+                Collectors.counting()
+            ));
 
         Map<Integer, Long> reservasPorMes = reservas.stream()
             .collect(Collectors.groupingBy(r -> r.getFechaInicio().getMonthValue(), Collectors.counting()));
@@ -58,10 +63,10 @@ public class GestionEstadisticasController {
 
         model.addAttribute("ingresosAcumulados", ingresosAcumulados);
 
-        // Simulación de ocupación mensual 
+
         Map<Integer, Double> ocupacionPorMes = reservaService.calcularOcupacionMensual(year, reservas, alojamientos.size());
 
-        // Formateo para ECharts 
+
         List<String> meses = List.of("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
 
         model.addAttribute("anioSeleccionado", year);
