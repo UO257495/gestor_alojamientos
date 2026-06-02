@@ -58,8 +58,27 @@ public class TemporadaService {
         return temporadaRepository.save(temporada);
     }
 
-    public void eliminar(Long id) {
-        temporadaRepository.deleteById(id);
+    public boolean eliminar(Long id) {
+        Optional<Temporada> temporadaOpt = temporadaRepository.findById(id);
+
+        if (temporadaOpt.isEmpty()) {
+            return false;
+        }
+
+        Temporada temporada = temporadaOpt.get();
+
+        boolean tieneReservas = temporadaRepository.tieneReservasAsociadas(
+                temporada.getAlojamiento().getId(),
+                temporada.getFechaInicio(),
+                temporada.getFechaFin()
+        );
+
+        if (tieneReservas) {
+            return false;
+        }
+
+        temporadaRepository.delete(temporada);
+        return true;
     }
 
     

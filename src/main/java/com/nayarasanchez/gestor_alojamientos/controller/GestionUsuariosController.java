@@ -1,6 +1,5 @@
 package com.nayarasanchez.gestor_alojamientos.controller;
 
-import java.net.Authenticator;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -59,14 +58,12 @@ public class GestionUsuariosController {
     public String mostrarFormularioRegistro(Model model, Authentication auth) {
         Usuario usuario = new Usuario();
         
-        // Si es un usuario anónimo (no logueado), le preasignamos el rol CLIENTE
         if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
             usuario.setRol(Rol.CLIENTE);
         }
 
         model.addAttribute("usuario", usuario);
         model.addAttribute("roles", Rol.values());
-        // Lo dejamos a false, el HTML ya se encarga de ocultarlo con sec:authorize si no es ADMIN/PROPIETARIO
         model.addAttribute("soloLecturaRoles", false); 
         model.addAttribute("modoPerfil", false);
 
@@ -125,7 +122,15 @@ public class GestionUsuariosController {
                         @RequestParam("confirmarPassword") String confirmarPassword,
                         @Valid @ModelAttribute("usuario") UsuarioForm usuarioForm,
                         BindingResult result, Model model, Locale locale,
-                        RedirectAttributes redirectAttributes) {
+                        RedirectAttributes redirectAttributes,
+                        Authentication auth) {
+
+        boolean esAdmin = auth.getAuthorities().stream()
+        .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+        if (!esAdmin) {
+            return "redirect:/gestion/usuarios/perfil";
+        }
 
         if (result.hasErrors()) {
             model.addAttribute("roles", Rol.values());
@@ -138,7 +143,6 @@ public class GestionUsuariosController {
             return "gestion/usuarios/detalle";
         }
         
-        // password opcional
         if (!password.isBlank()) {
             if (!password.equals(confirmarPassword)) {
                 model.addAttribute("roles", Rol.values());
@@ -204,7 +208,6 @@ public class GestionUsuariosController {
             return "gestion/usuarios/detalle";
         }
 
-        // password opcional
         if (!password.isBlank()) {
             if (!password.equals(confirmarPassword)) {
                 model.addAttribute("usuario", usuarioActual);
@@ -228,12 +231,14 @@ public class GestionUsuariosController {
         usuarioForm.setId(usuarioActual.getId());
         usuarioForm.setEmail(usuarioActual.getEmail());
 
-        usuarioService.editarUsuario(usuarioActual, usuarioForm, password);
+        usuarioService.editarPerfilUsuario(usuarioActual, usuarioForm, password);
 
         redirectAttributes.addFlashAttribute("mensajeUsuario",
             MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.guardado", null, locale)));
 
         return "redirect:/gestion/usuarios/perfil";
     }
+
+    
 
 }

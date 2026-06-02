@@ -79,8 +79,21 @@ public class GestionTemporadasController {
     }
 
     @GetMapping("/eliminar")
-    public String eliminar(@RequestParam("id") Long id) {
-        temporadaService.eliminar(id);
+    public String eliminar(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {
+        boolean eliminada = temporadaService.eliminar(id);
+
+        if (eliminada) {
+            redirectAttributes.addFlashAttribute(
+                "mensajeUsuario",
+                MensajeUsuario.mensajeCorrecto("Temporada eliminada correctamente")
+            );
+        } else {
+            redirectAttributes.addFlashAttribute(
+                "mensajeUsuario",
+                MensajeUsuario.mensajeError("No se puede eliminar la temporada porque tiene reservas asociadas")
+            );
+        }
+
         return "redirect:/gestion/temporadas/lista";
     }
 

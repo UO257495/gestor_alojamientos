@@ -11,7 +11,6 @@ import com.nayarasanchez.gestor_alojamientos.model.Reserva;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     
-    // Buscar reservas por cliente, alojamiento, fechas, etc., si lo necesitas:
     List<Reserva> findByAlojamientoId(Long alojamientoId);
 
     List<Reserva> findByClienteIdOrderByIdDesc(Long clienteId);

@@ -16,7 +16,6 @@ import org.passay.PropertiesMessageResolver;
 import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +61,6 @@ public class UsuarioService {
     }
 
      /**
-     * Comprueba si la contraseña de usuario cumple la política de calidad de contraseñas.
      * Implementación obtenida de https://dzone.com/articles/spring-boot-custom-password-validator-using-passay.
      * @param password
      * @return
@@ -70,24 +68,16 @@ public class UsuarioService {
     @SneakyThrows
     public boolean comprobarPoliticaCalidadPassword(String password) {
 
-        // Mensajes de los errores de validación
         Properties props = new Properties();
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("passay.properties");
         props.load(inputStream);
         MessageResolver resolver = new PropertiesMessageResolver(props);
 
         PasswordValidator validator = new PasswordValidator(resolver, Arrays.asList(
-            // Longitud mínima entre 8 y máxima de 16
             new LengthRule(8, 16),
-            // Al menos una mayúscula
             new CharacterRule(EnglishCharacterData.UpperCase, 1),
-            // Al menos una letra minúscula
             new CharacterRule(EnglishCharacterData.LowerCase, 1),
-            // Al menos un número
             new CharacterRule(EnglishCharacterData.Digit, 1),
-            // Al menos un caracter especial (símbolo)
-            //new CharacterRule(EnglishCharacterData.Special, 1),
-            // Sin espacios en blanco
             new WhitespaceRule()
         ));
 
@@ -110,7 +100,6 @@ public class UsuarioService {
         usuario.setDni(form.getDni());
         usuario.setTelefono(form.getTelefono());
         usuario.setPassword(passwordEncoder.encode(password));
-        // Si el usuario no está logueado o no tiene permisos para cambiar rol
         if (auth == null || !auth.isAuthenticated() || 
             auth.getAuthorities().stream()
                 .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_PROPIETARIO"))) {
@@ -127,11 +116,11 @@ public class UsuarioService {
         usuarioExistente.setDni(form.getDni());
         usuarioExistente.setTelefono(form.getTelefono());
         usuarioExistente.setRol(form.getRol());
+
         if (password != null && !password.isBlank()) {
             usuarioExistente.setPassword(passwordEncoder.encode(password));
-         }else{
-            usuarioExistente.setPassword(usuarioExistente.getPassword());
-         }
+        }
+
         return usuarioRepository.save(usuarioExistente);
     }
 
@@ -139,24 +128,30 @@ public class UsuarioService {
         return usuarioRepository.existsByDni(dni);
     }
     
-    /**
-     * Comprueba si un DNI ya está registrado.
-     * Si pasamos un ID (modo edición), ignora a ese mismo usuario para que no "choque" consigo mismo.
-     */
+
     public boolean comprobarDniEnUso(String dni, Long idUsuarioActual) {
         Optional<Usuario> usuarioEnBD = usuarioRepository.findByDni(dni);
         
         if (usuarioEnBD.isPresent()) {
-            // Si el ID del usuario que encontramos es distinto al que estamos editando...
             if (idUsuarioActual != null && !usuarioEnBD.get().getId().equals(idUsuarioActual)) {
-                return true; // El DNI lo está usando OTRA persona. ¡Error!
+                return true; 
             }
-            // Si estamos creando un usuario nuevo (ID es null), entonces sí es un error
             if (idUsuarioActual == null) {
                 return true;
             }
         }
-        // Si llegamos aquí, el DNI está libre o es el suyo propio
         return false;
+    }
+
+    public Usuario editarPerfilUsuario(Usuario usuarioExistente, UsuarioForm form, String password) {
+        usuarioExistente.setNombre(form.getNombre());
+        usuarioExistente.setDni(form.getDni());
+        usuarioExistente.setTelefono(form.getTelefono());
+
+        if (password != null && !password.isBlank()) {
+            usuarioExistente.setPassword(passwordEncoder.encode(password));
+        }
+
+        return usuarioRepository.save(usuarioExistente);
     }
 }

@@ -11,14 +11,11 @@ import com.nayarasanchez.gestor_alojamientos.model.Temporada;
 
 public interface TemporadaRepository extends JpaRepository<Temporada, Long> {
 
-    // Verifica si existe solapamiento de fechas en un alojamiento
+
     boolean existsByAlojamientoIdAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(
             Long alojamientoId, LocalDate fechaFin, LocalDate fechaInicio);
 
-    /**
-     * Devuelve el precio de la temporada que aplica a un alojamiento
-     * durante el rango de fechas indicado.
-     */
+
     @Query("""
         SELECT t.precio
         FROM Temporada t
@@ -36,5 +33,17 @@ public interface TemporadaRepository extends JpaRepository<Temporada, Long> {
     );
 
     
+    @Query("""
+    SELECT COUNT(r) > 0
+    FROM Reserva r
+    WHERE r.alojamiento.id = :alojamientoId
+      AND r.fechaInicio <= :fechaFin
+      AND r.fechaFin >= :fechaInicio
+    """)
+    boolean tieneReservasAsociadas(
+        @Param("alojamientoId") Long alojamientoId,
+        @Param("fechaInicio") LocalDate fechaInicio,
+        @Param("fechaFin") LocalDate fechaFin
+    );
 }
 

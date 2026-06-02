@@ -11,7 +11,7 @@
 
         <h1 class="mb-4">
             <i class="fa-solid fa-user text-secondary"></i> Usuarios 
-            <a sec:authorize="hasAnyRole('ADMIN','PROPIETARIO')" class="btn btn-success btn-sm me-2" title="Nuevo usuario" th:href="@{/gestion/usuarios/detalle}"><i class="fa-solid fa-plus"></i></a>
+            <a sec:authorize="hasRole('ADMIN')" class="btn btn-success btn-sm me-2" title="Nuevo usuario" th:href="@{/gestion/usuarios/detalle}"><i class="fa-solid fa-plus"></i></a>
         </h1>
 
         <div th:replace="fragments/mensajes :: mensajes-alerta(mensajeUsuario=${mensajeUsuario})"></div>
@@ -33,9 +33,15 @@
                     <td th:text="${usuario.email}"></td>
                     <td th:text="${usuario.telefono}"></td>
                     <td class="dt-right">
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-primary" title="Editar" data-accion="editar" th:data-id="${usuario.id}"><i class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="btn btn-outline-danger" title="Eliminar" data-accion="eliminar" th:data-id="${usuario.id}"><i class="fa-solid fa-trash"></i></button>
+                        <div class="btn-group btn-group-sm" sec:authorize="hasRole('ADMIN')">
+                            <button type="button" class="btn btn-outline-primary"
+                                    title="Editar" data-accion="editar" th:data-id="${usuario.id}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger"
+                                    title="Eliminar" data-accion="eliminar" th:data-id="${usuario.id}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>

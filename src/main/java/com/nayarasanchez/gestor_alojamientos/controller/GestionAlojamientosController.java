@@ -78,9 +78,22 @@ public class GestionAlojamientosController {
     }
 
     @GetMapping("/eliminar")
-    public String eliminar(@RequestParam("id") Long id) {
-        alojamientoService.eliminar(id);
-        return "redirect:lista";
+    public String eliminar(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {
+        boolean eliminado = alojamientoService.eliminar(id);
+
+        if (eliminado) {
+            redirectAttributes.addFlashAttribute(
+                "mensajeUsuario",
+                MensajeUsuario.mensajeCorrecto("Alojamiento eliminado correctamente")
+            );
+        } else {
+            redirectAttributes.addFlashAttribute(
+                "mensajeUsuario",
+                MensajeUsuario.mensajeError("No se puede eliminar el alojamiento porque tiene reservas asociadas")
+            );
+        }
+
+        return "redirect:/gestion/alojamientos/lista";
     }
         
 }

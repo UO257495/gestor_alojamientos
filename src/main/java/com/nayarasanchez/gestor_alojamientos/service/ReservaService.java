@@ -38,31 +38,21 @@ public class ReservaService {
     @Autowired
     private EmailService emailService;
     
-    /**
-     * Lista todas las reservas registrados
-     */
+
     public List<Reserva> listarTodas() {
         return reservaRepository.findAll();
     }
 
-    /**
-     * Busca un reserva por su ID
-     */
+
     public Optional<Reserva> buscarPorId(Long id) {
         return reservaRepository.findById(id);
     }
 
-     /**
-     * Busca un reserva por email del cliente
-     */
     public List<Reserva> buscarPorClienteId(Long id) {
         return reservaRepository.findByClienteIdOrderByIdDesc(id);
     }
 
     
-    /**
-     * Crea o actualiza una reserva del propietario
-     */
     public Reserva crearOActualizar(ReservaForm form) {
         Reserva reserva = (form.getId() != null)
                 ? reservaRepository.findById(form.getId()).orElse(new Reserva())
@@ -98,7 +88,6 @@ public class ReservaService {
 
         Reserva reservaGuardada = reservaRepository.save(reserva);
 
-        //Envio de email 
          String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
          String mensaje = ""; 
 
@@ -148,9 +137,7 @@ public class ReservaService {
         return reservaGuardada;
     }
 
-        /**
-     * Crea o actualiza una reserva de un cliente
-     */
+
     public Reserva crearReservaCliente(ReservaForm form) {
         Reserva reserva = (form.getId() != null)
                 ? reservaRepository.findById(form.getId()).orElse(new Reserva())
@@ -186,7 +173,6 @@ public class ReservaService {
 
         Reserva reservaGuardada = reservaRepository.save(reserva);
 
-        //Enviar email de recepción
         String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
         String mensaje = "Hola " + cliente.getNombre() + ",\n\n"
                 + "Tu petición de reserva del "
@@ -225,11 +211,8 @@ public class ReservaService {
         reservaRepository.save(reserva);
     }
 
-    /**
-     * Calcula el precio total de una reserva calculando NOCHE a NOCHE.
-     */
+
     public double calcularTotal(Long alojamientoId, LocalDate inicio, LocalDate fin) {
-        // Validación: El check-out debe ser posterior al check-in
         if (alojamientoId == null || inicio == null || fin == null || !fin.isAfter(inicio)) {
             return 0.0;
         }
@@ -240,16 +223,12 @@ public class ReservaService {
         double precioBase = alojamiento.getTarifaBase(); 
         double precioTotal = 0.0;
 
-        // Iteramos desde el check-in hasta el día ANTES del check-out
         for (LocalDate noche = inicio; noche.isBefore(fin); noche = noche.plusDays(1)) {
             
-            // Buscamos si ESA noche en concreto tiene precio de temporada
-            // Al pasar (noche, noche), el repositorio busca si esa fecha exacta cae en temporada
             Double precioTemporada = temporadaRepository
                     .findPrecioPorFechasYAlojamiento(noche, noche, alojamientoId)
                     .orElse(0.0);
 
-            // Sumamos la noche al total
             precioTotal += (precioBase + precioTemporada);
         }
 
@@ -274,7 +253,7 @@ public class ReservaService {
     }
 
     public List<Integer> obtenerAniosConDatos() {
-        return reservaRepository.findDistinctAnios(); // consulta JPQL personalizada
+        return reservaRepository.findDistinctAnios(); 
     }
 
     public Map<Integer, Double> calcularOcupacionMensual(int anio, List<Reserva> reservas, int totalAlojamientos) {
@@ -286,24 +265,21 @@ public class ReservaService {
                     YearMonth ym = YearMonth.of(anio, mes);
                     int diasMes = ym.lengthOfMonth();
 
-                    // Inicializamos todos los días del mes a 0 ocupación
                     Map<LocalDate, Long> ocupacionPorDia = IntStream.rangeClosed(1, diasMes)
                             .mapToObj(ym::atDay)
                             .collect(Collectors.toMap(d -> d, d -> 0L));
 
                     for (Reserva r : reservas) {
-                        // Iteramos noche a noche (usando isBefore excluye el día de salida)
                         for (LocalDate noche = r.getFechaInicio(); noche.isBefore(r.getFechaFin()); noche = noche.plusDays(1)) {
                             
-                            // Si la noche en la que duerme cae en el mes y año que estamos calculando, la contamos
                             if (noche.getMonthValue() == mes && noche.getYear() == anio) {
                                 ocupacionPorDia.put(noche, ocupacionPorDia.get(noche) + 1);
                             }
                         }
                     }
 
-                    // Calculamos el promedio de ocupación de esas noches en porcentaje
-                    if (totalAlojamientos == 0) return 0.0; // Evitar división por cero
+
+                    if (totalAlojamientos == 0) return 0.0; 
                     
                     return ocupacionPorDia.values().stream()
                             .mapToDouble(c -> (c * 100.0) / totalAlojamientos)

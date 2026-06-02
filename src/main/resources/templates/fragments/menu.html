@@ -34,7 +34,7 @@
 								<i class="fa-solid fa-list-check"></i> Gestión
 							</a>
 							<ul class="dropdown-menu">
-								<li>
+								<li sec:authorize="hasRole('ADMIN')">
 									<a class="dropdown-item" th:href="@{/gestion/usuarios/lista}">
 										<i class="fa-solid fa-user"></i> Usuarios
 									</a>

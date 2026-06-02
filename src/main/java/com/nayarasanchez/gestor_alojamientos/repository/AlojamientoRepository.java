@@ -16,11 +16,11 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long>{
 
     @Query("SELECT a FROM Alojamiento a " +
         "WHERE (:direccion IS NULL OR LOWER(a.direccion) LIKE LOWER(CONCAT('%', :direccion, '%'))) " +
-        "AND (:personas IS NULL OR a.capacidad >= :personas) " +  // Capacidad >= personas
+        "AND (:personas IS NULL OR a.capacidad >= :personas) " + 
         "AND (:fechaInicio IS NULL OR :fechaFin IS NULL OR NOT EXISTS (" +
         "     SELECT r FROM Reserva r " +
         "     WHERE r.alojamiento = a " +
-        "       AND r.estado IN ('CONFIRMADA', 'PENDIENTE') " + // Solo reservas que bloquean el alojamiento
+        "       AND r.estado IN ('CONFIRMADA', 'PENDIENTE') " + 
         "       AND r.fechaInicio <= :fechaFin " +
         "       AND r.fechaFin >= :fechaInicio" +
         "))")
@@ -33,5 +33,8 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long>{
 
     Optional<Alojamiento> findById(Long id);
 
+
+    @Query("SELECT COUNT(r) > 0 FROM Reserva r WHERE r.alojamiento.id = :id")
+    boolean tieneReservas(@Param("id") Long id);
     
 }
