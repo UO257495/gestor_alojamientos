@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head ('Aviso legal')}"></th:block>
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: principal}"></div>
+
+<section class="container contenido">
+    <h1>Aviso Legal</h1>
+
+    <p>
+        Esta aplicación web forma parte de un proyecto académico para la gestión de
+        alojamientos rurales.
+    </p>
+
+    <h2>Responsable</h2>
+    <p>
+        Responsable de la plataforma: Nayara Sánchez.
+    </p>
+
+    <h2>Objeto del sitio web</h2>
+    <p>
+        El sitio permite gestionar usuarios, alojamientos, reservas, reseñas y otros
+        elementos relacionados con la administración de un alojamiento rural.
+    </p>
+
+    <h2>Condiciones de uso</h2>
+    <p>
+        Los usuarios deberán utilizar la plataforma de forma adecuada, respetando la
+        normativa aplicable y evitando cualquier uso fraudulento o no autorizado.
+    </p>
+</section>
+
+<div th:replace="~{fragments/menu :: pie}"></div>
+<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

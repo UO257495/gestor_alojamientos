@@ -60,3 +60,16 @@
     color: #fff; /* opcional: texto blanco al hover */
     transition: background-color 0.2s ease-in-out;
 }
+
+html, body {
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.contenido {
+    flex: 1;
+}

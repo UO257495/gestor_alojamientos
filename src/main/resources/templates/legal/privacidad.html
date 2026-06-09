@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head ('Política de privacidad')}"></th:block>
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: principal}"></div>
+
+<section class="container contenido">
+    <h1>Política de Privacidad</h1>
+
+    <p>
+        Esta aplicación web de gestión de alojamientos rurales trata datos personales
+        de los usuarios con la finalidad de gestionar registros, reservas y comunicaciones
+        relacionadas con el servicio.
+    </p>
+
+    <h2>Datos tratados</h2>
+    <p>
+        Se podrán tratar datos identificativos y de contacto, como nombre, apellidos,
+        DNI, correo electrónico y teléfono, así como información asociada a las reservas.
+    </p>
+
+    <h2>Finalidad</h2>
+    <p>
+        Los datos se utilizarán exclusivamente para la gestión del alojamiento rural,
+        la prestación de los servicios ofrecidos y el cumplimiento de obligaciones legales.
+    </p>
+
+    <h2>Seguridad</h2>
+    <p>
+        Las contraseñas se almacenan cifradas mediante BCrypt. El acceso a los datos
+        personales está restringido según el rol del usuario.
+    </p>
+
+    <h2>Derechos</h2>
+    <p>
+        Los usuarios podrán solicitar la modificación o eliminación de sus datos personales
+        contactando con el responsable de la plataforma.
+    </p>
+</section>
+
+<div th:replace="~{fragments/menu :: pie}"></div>
+<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

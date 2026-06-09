@@ -49,6 +49,7 @@ public class GestionUsuariosController {
         model.addAttribute("roles", Rol.values());
         model.addAttribute("soloLecturaRoles", false);
         model.addAttribute("modoPerfil", false);
+        model.addAttribute("esRegistroPublico", false);
 
         return "gestion/usuarios/detalle";
     }
@@ -58,7 +59,12 @@ public class GestionUsuariosController {
     public String mostrarFormularioRegistro(Model model, Authentication auth) {
         Usuario usuario = new Usuario();
         
-        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+        boolean esRegistroPublico =
+            auth == null
+            || !auth.isAuthenticated()
+            || auth.getName().equals("anonymousUser");
+
+        if (esRegistroPublico) {
             usuario.setRol(Rol.CLIENTE);
         }
 
@@ -66,6 +72,7 @@ public class GestionUsuariosController {
         model.addAttribute("roles", Rol.values());
         model.addAttribute("soloLecturaRoles", false); 
         model.addAttribute("modoPerfil", false);
+        model.addAttribute("esRegistroPublico", esRegistroPublico);
 
         return "gestion/usuarios/detalle";
     }
@@ -77,30 +84,73 @@ public class GestionUsuariosController {
                         BindingResult result, Model model, Locale locale,
                         RedirectAttributes redirectAttributes, Authentication auth) {
 
+        boolean esRegistroPublico =
+        auth == null
+        || !auth.isAuthenticated()
+        || auth.getName().equals("anonymousUser");
+
+        if (esRegistroPublico &&
+            (usuarioForm.getAceptaPrivacidad() == null || !usuarioForm.getAceptaPrivacidad())) {
+
+            result.rejectValue(
+                "aceptaPrivacidad",
+                "error.usuario",
+                "Debe aceptar la política de privacidad"
+            );
+
+            model.addAttribute("mensajePrivacidad", "Debe aceptar la política de privacidad");
+        }
+
         if (usuarioService.comprobarDniEnUso(usuarioForm.getDni())) {
             result.rejectValue("dni", "error.usuario", "Ya existe un usuario registrado con este DNI.");
         }
 
-        if (result.hasErrors() || !password.equals(confirmarPassword)) {
+        if (result.hasErrors()) {
             model.addAttribute("roles", Rol.values());
+            model.addAttribute("soloLecturaRoles", false);
+            model.addAttribute("modoPerfil", false);
+            model.addAttribute("esRegistroPublico", esRegistroPublico);
+
             model.addAttribute("mensajeUsuario",
-                MensajeUsuario.mensajeError(password.equals(confirmarPassword) 
-                    ? messageSource.getMessage("validation.password.no-calidad", null, locale)
-                    : messageSource.getMessage("validation.password.no-iguales", null, locale)));
+                MensajeUsuario.mensajeError("Revisa los campos del formulario"));
+
+            return "gestion/usuarios/detalle";
+        }
+
+        if (!password.equals(confirmarPassword)) {
+            model.addAttribute("roles", Rol.values());
+            model.addAttribute("soloLecturaRoles", false);
+            model.addAttribute("modoPerfil", false);
+            model.addAttribute("esRegistroPublico", esRegistroPublico);
+
+            model.addAttribute("mensajeUsuario",
+                MensajeUsuario.mensajeError(
+                    messageSource.getMessage("validation.password.no-iguales", null, locale)));
+
             return "gestion/usuarios/detalle";
         }
 
         if (usuarioService.comprobarEmailEnUso(usuarioForm.getEmail())) {
             model.addAttribute("roles", Rol.values());
+            model.addAttribute("soloLecturaRoles", false);
+            model.addAttribute("modoPerfil", false);
+            model.addAttribute("esRegistroPublico", esRegistroPublico);
+
             model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError(
                     messageSource.getMessage("validation.login", null, locale)));
+
             return "gestion/usuarios/detalle";
         }
 
         if (!usuarioService.comprobarPoliticaCalidadPassword(password)) {
             model.addAttribute("roles", Rol.values());
+            model.addAttribute("soloLecturaRoles", false);
+            model.addAttribute("modoPerfil", false);
+            model.addAttribute("esRegistroPublico", esRegistroPublico);
+
             model.addAttribute("mensajeUsuario", MensajeUsuario.mensajeError(
                     messageSource.getMessage("validation.password.no-calidad", null, locale)));
+
             return "gestion/usuarios/detalle";
         }
 
@@ -184,6 +234,7 @@ public class GestionUsuariosController {
         model.addAttribute("usuario", usuario);
         model.addAttribute("soloLecturaRoles", true);
         model.addAttribute("modoPerfil", true);
+        model.addAttribute("esRegistroPublico", false);
 
         return "gestion/usuarios/detalle";
     }

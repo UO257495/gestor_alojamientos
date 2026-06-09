@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<th:block th:replace="~{fragments/head :: head ('Buscador de alojamientos')}"></th:block>
+</head>
+<body>
+
+    <div th:replace="~{fragments/menu :: principal}"></div>
+
+    <section class="container contenido">
+        <h1>Política de Cookies</h1>
+
+        <p>
+            Esta aplicación utiliza cookies técnicas necesarias para permitir el correcto
+            funcionamiento de la plataforma, como el inicio de sesión y la seguridad de la sesión.
+        </p>
+
+        <p>
+            No se utilizan cookies publicitarias ni cookies analíticas de terceros.
+        </p>
+
+        <p>
+            Al tratarse de cookies técnicas necesarias, no requieren consentimiento previo,
+            aunque se informa de su uso conforme a la LSSI-CE.
+        </p>
+    </section>
+
+
+    <div th:replace="~{fragments/menu :: pie}"></div>
+
+	<th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+
+</body>
+</html>

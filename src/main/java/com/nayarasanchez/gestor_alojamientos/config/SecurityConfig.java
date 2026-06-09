@@ -67,7 +67,16 @@ public class SecurityConfig {
             .requestMatchers("/css/**", "/img/**", "/fontawesome/**", "/js/**").permitAll()
 
             // Públicos (login/registro)
-            .requestMatchers("/inicio", "/login", "/registro", "/auth/**", "/gestion/usuarios/nuevo").permitAll()
+            .requestMatchers(
+                "/inicio", 
+                "/login", 
+                "/registro", 
+                "/auth/**", 
+                "/gestion/usuarios/nuevo",
+                "/privacidad",
+                "/cookies",
+                "/aviso-legal"
+            ).permitAll()
 
             .requestMatchers("/gestion/usuarios/perfil").authenticated()
             

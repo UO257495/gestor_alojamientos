@@ -104,6 +104,30 @@
                         </div>
                     </div>
 
+                    <div class="mb-3 row" th:if="${esRegistroPublico}">
+                        <div class="offset-sm-2 col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                    type="checkbox"
+                                    id="aceptaPrivacidad"
+                                    name="aceptaPrivacidad"
+                                    value="true" />
+                                <label class="form-check-label" for="aceptaPrivacidad">
+                                    He leído y acepto la
+                                    <a th:href="@{/privacidad}" target="_blank">
+                                        política de privacidad
+                                    </a>
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+
+                            <small class="text-danger"
+                                th:if="${mensajePrivacidad != null}"
+                                th:text="${mensajePrivacidad}">
+                            </small>
+                        </div>
+                    </div>
+
                     <hr class="my-4" />
             
                     <div class="my-4 text-end">

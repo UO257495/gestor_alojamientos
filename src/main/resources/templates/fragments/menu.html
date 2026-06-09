@@ -101,18 +101,37 @@
     <!-- Fragmento de MENÚ DEL PIE                                                             -->
     <!-- ====================================================================================== -->
 
-	<footer th:fragment="pie" class="mt-auto py-3 fixed-bottom text-white border-top"
-        style="background-color:#2E7D32;">
+	<footer th:fragment="pie"
+        class="mt-auto py-3 text-white border-top" style="background-color:#2E7D32;">
         <div class="container-fluid">
 			&copy; 2025
 			&middot; TFG Nayara Sánchez
 			&middot; v<span th:text="${@environment.getProperty('info.app.version')}"></span>
 			&middot; <span th:text="${#locale}"></span>
             <ul class="list-inline float-end mb-0">
-                <li class="list-inline-item"><a href="#" class="text-white">Política de privacidad</a></li>
-                <li class="list-inline-item"><a href="#" class="text-white">Contacto</a></li>
-				<li class="list-inline-item" th:title="${@environment.getProperty('info.app.name') + ' v' + @environment.getProperty('info.app.version')}"><i class="fa-solid fa-circle-info"></i></li>
-            </ul>
+				<li class="list-inline-item">
+					<a th:href="@{/privacidad}" class="text-white">
+						Política de privacidad
+					</a>
+				</li>
+
+				<li class="list-inline-item">
+					<a th:href="@{/cookies}" class="text-white">
+						Cookies
+					</a>
+				</li>
+
+				<li class="list-inline-item">
+					<a th:href="@{/aviso-legal}" class="text-white">
+						Aviso legal
+					</a>
+				</li>
+
+				<li class="list-inline-item"
+					th:title="${@environment.getProperty('info.app.name') + ' v' + @environment.getProperty('info.app.version')}">
+					<i class="fa-solid fa-circle-info"></i>
+				</li>
+			</ul>
         </div>
     </footer>
 
