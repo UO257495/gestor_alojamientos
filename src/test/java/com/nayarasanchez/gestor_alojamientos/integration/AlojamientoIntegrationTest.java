@@ -5,33 +5,46 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nayarasanchez.gestor_alojamientos.dto.form.AlojamientoForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.repository.AlojamientoRepository;
+import com.nayarasanchez.gestor_alojamientos.service.AlojamientoService;
+import com.nayarasanchez.gestor_alojamientos.service.SupabaseStorageService;
 
 @SpringBootTest
 @Transactional
 class AlojamientoIntegrationTest {
 
     @Autowired
+    private AlojamientoService alojamientoService;
+
+    @Autowired
     private AlojamientoRepository alojamientoRepository;
 
+    @MockBean
+    private SupabaseStorageService storageService;
+
     @Test
-    void guardarAlojamiento_debePersistirCorrectamente() {
-        Alojamiento alojamiento = new Alojamiento();
-        alojamiento.setNombre("Casa rural de prueba");
-        alojamiento.setDireccion("Peón, Villaviciosa");
-        alojamiento.setDescripcion("Alojamiento creado durante una prueba de integración.");
-        alojamiento.setCapacidad(4);
-        alojamiento.setTarifaBase(80.00);
-        alojamiento.setLatitud(43.4812);
-        alojamiento.setLongitud(-5.4351);
+    void PI01_crearYPersistirAlojamiento() throws Exception {
+        AlojamientoForm form = new AlojamientoForm();
+        form.setNombre("Casa rural de prueba");
+        form.setDireccion("Peón, Villaviciosa");
+        form.setDescripcion("Alojamiento creado durante una prueba de integración.");
+        form.setCapacidad(4);
+        form.setTarifaBase(80.00);
+        form.setLatitud(43.4812);
+        form.setLongitud(-5.4351);
 
-        Alojamiento guardado = alojamientoRepository.save(alojamiento);
+        Alojamiento guardado = alojamientoService.crearOActualizar(form);
 
-        assertNotNull(guardado.getId());
-        assertEquals("Casa rural de prueba", guardado.getNombre());
-        assertEquals(4, guardado.getCapacidad());
+        Alojamiento encontrado = alojamientoRepository.findById(guardado.getId()).orElseThrow();
+
+        assertNotNull(encontrado.getId());
+        assertEquals("Casa rural de prueba", encontrado.getNombre());
+        assertEquals("Peón, Villaviciosa", encontrado.getDireccion());
+        assertEquals(4, encontrado.getCapacidad());
     }
 }

@@ -10,38 +10,57 @@ import org.junit.jupiter.api.Test;
 class ReservaServiceTest {
 
     @Test
-    void calcularNumeroNoches_noDebeCobrarDiaSalida() {
-        LocalDate fechaInicio = LocalDate.of(2026, 7, 1);
-        LocalDate fechaFin = LocalDate.of(2026, 7, 5);
+    void PUNI01_calcularNumeroNoches_sinCobrarDiaSalida() {
+        LocalDate fechaEntrada = LocalDate.of(2026, 7, 1);
+        LocalDate fechaSalida = LocalDate.of(2026, 7, 5);
 
-        long noches = fechaFin.toEpochDay() - fechaInicio.toEpochDay();
+        long noches = fechaSalida.toEpochDay() - fechaEntrada.toEpochDay();
 
         assertEquals(4, noches);
     }
 
     @Test
-    void calcularPrecioTotal_debeMultiplicarPrecioPorNoches() {
-        BigDecimal precioNoche = new BigDecimal("80.00");
-        int noches = 4;
+    void PUNI02_calcularPrecioTotalReserva() {
+        BigDecimal precioPorNoche = new BigDecimal("80.00");
+        int numeroNoches = 4;
 
-        BigDecimal total = precioNoche.multiply(BigDecimal.valueOf(noches));
+        BigDecimal total = precioPorNoche.multiply(BigDecimal.valueOf(numeroNoches));
 
         assertEquals(new BigDecimal("320.00"), total);
     }
 
     @Test
-    void fechasInvalidas_debeDetectarFechaFinAnteriorAFechaInicio() {
-        LocalDate fechaInicio = LocalDate.of(2026, 7, 10);
-        LocalDate fechaFin = LocalDate.of(2026, 7, 5);
+    void PUNI03_rechazarFechaSalidaAnteriorAFechaEntrada() {
+        LocalDate fechaEntrada = LocalDate.of(2026, 7, 10);
+        LocalDate fechaSalida = LocalDate.of(2026, 7, 5);
 
-        assertFalse(fechaFin.isAfter(fechaInicio));
+        boolean fechasValidas = fechaSalida.isAfter(fechaEntrada);
+
+        assertFalse(fechasValidas);
     }
 
     @Test
-    void reservaConMismaFechaInicioYFin_debeSerInvalida() {
-        LocalDate fechaInicio = LocalDate.of(2026, 7, 10);
-        LocalDate fechaFin = LocalDate.of(2026, 7, 10);
+    void PUNI03_rechazarFechaSalidaIgualAFechaEntrada() {
+        LocalDate fechaEntrada = LocalDate.of(2026, 7, 10);
+        LocalDate fechaSalida = LocalDate.of(2026, 7, 10);
 
-        assertFalse(fechaFin.isAfter(fechaInicio));
+        boolean fechasValidas = fechaSalida.isAfter(fechaEntrada);
+
+        assertFalse(fechasValidas);
+    }
+
+    @Test
+    void PUNI04_detectarSolapamientoReservas() {
+        LocalDate reservaExistenteEntrada = LocalDate.of(2026, 7, 10);
+        LocalDate reservaExistenteSalida = LocalDate.of(2026, 7, 15);
+
+        LocalDate nuevaReservaEntrada = LocalDate.of(2026, 7, 12);
+        LocalDate nuevaReservaSalida = LocalDate.of(2026, 7, 18);
+
+        boolean haySolapamiento =
+                nuevaReservaEntrada.isBefore(reservaExistenteSalida)
+                        && nuevaReservaSalida.isAfter(reservaExistenteEntrada);
+
+        assertTrue(haySolapamiento);
     }
 }

@@ -1,11 +1,11 @@
 Feature: Gestión de temporadas
 
-  Scenario: Crear una temporada válida
-    Given existe una temporada del 1 de julio de 2026 al 15 de julio de 2026
-    When se crea otra temporada del 16 de julio de 2026 al 31 de julio de 2026
-    Then el sistema permite crear la temporada
+  Scenario: PS-05 Creación de una temporada válida por parte del propietario
+    Given existe un alojamiento para gestionar temporadas
+    When el propietario crea una temporada válida
+    Then la temporada queda registrada correctamente
 
-  Scenario: Rechazar temporadas solapadas
-    Given existe una temporada del 1 de julio de 2026 al 15 de julio de 2026
-    When se crea otra temporada del 10 de julio de 2026 al 20 de julio de 2026
-    Then el sistema rechaza la temporada
+  Scenario: PS-06 Intento de crear una temporada solapada
+    Given existe una temporada previa para el alojamiento
+    When el propietario intenta crear una temporada solapada
+    Then el sistema muestra un error y no guarda la temporada

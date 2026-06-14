@@ -37,10 +37,10 @@ public class GestionTemporadasController {
     }
 
     @GetMapping("/detalle")
-    public String detalle(@RequestParam("id") Optional<Long> id, Model model) {
-        Temporada temporada = id
-                .flatMap(temporadaService::buscarPorId)
-                .orElse(new Temporada());
+    public String detalle(@RequestParam(value = "id", required = false) Long id, Model model) {
+        Temporada temporada = id != null
+                ? temporadaService.buscarPorId(id).orElse(new Temporada())
+                : new Temporada();
 
         model.addAttribute("temporada", temporada);
         model.addAttribute("alojamientos", alojamientoService.listarTodos());

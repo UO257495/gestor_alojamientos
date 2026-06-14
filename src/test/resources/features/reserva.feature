@@ -1,16 +1,11 @@
 Feature: Gestión de reservas
 
-  Scenario: Crear una reserva con fechas válidas
-    Given existe un alojamiento con precio base de 80 euros
-    When el cliente realiza una reserva del 1 de julio de 2026 al 5 de julio de 2026
-    Then el sistema calcula un total de 320 euros
+  Scenario: PS-03 Creación de una reserva válida por parte del cliente
+    Given existe un cliente y un alojamiento disponible
+    When el cliente realiza una reserva válida
+    Then la reserva se registra con estado PENDIENTE
 
-  Scenario: Rechazar una reserva con fechas inválidas
-    Given existe un alojamiento con precio base de 80 euros
-    When el cliente realiza una reserva del 5 de julio de 2026 al 1 de julio de 2026
-    Then el sistema rechaza la reserva
-
-  Scenario: No cobrar el día de salida
-    Given existe un alojamiento con precio base de 100 euros
-    When el cliente realiza una reserva del 10 de julio de 2026 al 12 de julio de 2026
-    Then el sistema calcula un total de 200 euros
+  Scenario: PS-04 Intento de reserva con fechas no disponibles
+    Given existe una reserva previa para el alojamiento
+    When el cliente intenta realizar una reserva solapada
+    Then el sistema impide crear la reserva

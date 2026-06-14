@@ -5,26 +5,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-public class AlojamientoServiceTest {
+class AlojamientoServiceTest {
 
     @Test
-    void capacidadDebeSerMayorQueCero() {
-        int capacidad = 4;
+    void PUNI08_validarNombreObligatorio() {
+        String nombre = "";
 
-        assertTrue(capacidad > 0);
+        assertTrue(nombre.isBlank());
     }
 
     @Test
-    void nombreAlojamientoNoDebeEstarVacio() {
-        String nombre = "Casa rural Peón";
+    void PUNI08_validarDireccionObligatoria() {
+        String direccion = "";
 
-        assertFalse(nombre.isBlank());
+        assertTrue(direccion.isBlank());
     }
 
     @Test
-    void direccionAlojamientoNoDebeEstarVacia() {
-        String direccion = "Peón, Villaviciosa";
+    void PUNI08_validarCapacidadMayorQueCero() {
+        int capacidad = 0;
 
-        assertFalse(direccion.isBlank());
+        assertFalse(capacidad > 0);
     }
 }

@@ -12,11 +12,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-class ReservaSeleniumTest {
+class TemporadaSeleniumTest {
 
     @Test
-    void PUI04_comprobarCargaFormularioReserva() {
-
+    void PUI05_comprobarCargaFormularioTemporada() {
         WebDriver driver = new ChromeDriver();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
@@ -24,28 +23,39 @@ class ReservaSeleniumTest {
         String password = System.getenv("TEST_PASS");
 
         try {
-
             driver.get("http://localhost:8080/login");
 
-            driver.findElement(By.id("email")).sendKeys(email);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")))
+                    .sendKeys(email);
+
             driver.findElement(By.id("password")).sendKeys(password);
-            
             driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-            driver.get("http://localhost:8080/gestion/reservas/detalle");
+            wait.until(ExpectedConditions.not(
+                    ExpectedConditions.urlContains("/login")
+            ));
 
-            WebElement fechaInicio =
-                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fechaInicioInput")));
+            driver.get("http://localhost:8080/gestion/temporadas/detalle");
 
+            System.out.println("URL actual: " + driver.getCurrentUrl());
+
+            assertFalse(
+                    driver.getCurrentUrl().contains("/login"),
+                    "Selenium ha sido redirigido al login. Revisa usuario, contraseña o permisos."
+            );
+
+            WebElement nombre = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(By.id("nombre"))
+            );
+
+            WebElement fechaInicio = driver.findElement(By.id("fechaInicioInput"));
             WebElement fechaFin = driver.findElement(By.id("fechaFinInput"));
-            WebElement formaPago = driver.findElement(By.id("formaPagoSelect"));
-            WebElement botonConfirmar =
-                    driver.findElement(By.cssSelector("button[type='submit']"));
+            WebElement precio = driver.findElement(By.name("precio"));
 
+            assertTrue(nombre.isDisplayed());
             assertTrue(fechaInicio.isDisplayed());
             assertTrue(fechaFin.isDisplayed());
-            assertTrue(formaPago.isDisplayed());
-            assertTrue(botonConfirmar.isDisplayed());
+            assertTrue(precio.isDisplayed());
 
         } finally {
             driver.quit();
