@@ -78,7 +78,6 @@
                 },
             });
 
-            // Botonera
             document.getElementById('tablaReservas').addEventListener('click', evt => {
                 const node = evt.composedPath().find(n => n.dataset && 'id' in n.dataset && 'accion' in n.dataset);
                 if (node) {

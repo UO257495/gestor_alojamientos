@@ -18,7 +18,7 @@
 .star-rating input:checked ~ label,
 .star-rating label:hover,
 .star-rating label:hover ~ label {
-    color: #f5c518; /* amarillo tipo "estrella" */
+    color: #f5c518; 
 }
 
 .custom-hover:hover {

@@ -78,7 +78,6 @@
 </script>
 
 <script>
-    // Gráfico circular de estados
     var chartEstados = echarts.init(document.getElementById('chartEstados'));
     chartEstados.setOption({
         tooltip: { trigger: 'item', formatter: '{b}: {c}' },
@@ -91,7 +90,6 @@
         }]
     });
 
-    // Gráfico circular de forma de pago
     var chartPagos = echarts.init(document.getElementById('chartPagos'));
     chartPagos.setOption({
         tooltip: { trigger: 'item', formatter: '{b}: {c}' },
@@ -103,7 +101,6 @@
         }]
     });
 
-    // Gráfico de líneas: reservas por mes
     var chartReservasMensuales = echarts.init(document.getElementById('chartReservasMensuales'));
     chartReservasMensuales.setOption({
         xAxis: { type: 'category', data: dataReservasMensuales.labels },
@@ -117,7 +114,6 @@
         }]
     });
 
-    // Gráfico de líneas: ingresos por mes
     var chartIngresosMensuales = echarts.init(document.getElementById('chartIngresosMensuales'));
     chartIngresosMensuales.setOption({
         xAxis: { type: 'category', data: dataIngresosMensuales.labels },
@@ -134,7 +130,6 @@
         }]
     });
 
-    // Gráfico de líneas: ocupación mensual
     var chartOcupacionMensual = echarts.init(document.getElementById('chartOcupacionMensual'));
     const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const ocupacionCompletos = meses.map((m, i) => dataOcupacionMensual.labels.includes(m) 
@@ -148,7 +143,6 @@
         tooltip: { 
             trigger: 'axis', 
             formatter: function(params){ 
-                // Redondeamos a 2 decimales en el recuadro negro al pasar el ratón
                 return params[0].axisValue + ': ' + Number(params[0].data).toFixed(2) + ' %'; 
             } 
         },
@@ -160,7 +154,6 @@
                 show: true, 
                 position: 'top', 
                 formatter: function(params) {
-                    // Redondeamos a 2 decimales en el número que sale encima de la línea
                     return Number(params.data).toFixed(2) + ' %';
                 } 
             }

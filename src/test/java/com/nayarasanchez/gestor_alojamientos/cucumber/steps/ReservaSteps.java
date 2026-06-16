@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
-import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
 import com.nayarasanchez.gestor_alojamientos.model.EstadoReserva;
 import com.nayarasanchez.gestor_alojamientos.model.FormaPago;
 import com.nayarasanchez.gestor_alojamientos.model.Reserva;
@@ -39,7 +37,7 @@ public class ReservaSteps {
     @Autowired
     private AlojamientoRepository alojamientoRepository;
 
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
 
     private Usuario cliente;

@@ -2,17 +2,13 @@ package com.nayarasanchez.gestor_alojamientos.service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.nayarasanchez.gestor_alojamientos.dto.form.ReservaForm;
 import com.nayarasanchez.gestor_alojamientos.model.Alojamiento;
 import com.nayarasanchez.gestor_alojamientos.model.EstadoPago;
@@ -34,9 +30,7 @@ public class ReservaService {
     private final AlojamientoRepository alojamientoRepository;
     private final TemporadaRepository temporadaRepository;
     private final UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
     
 
     public List<Reserva> listarTodas() {
@@ -52,141 +46,131 @@ public class ReservaService {
         return reservaRepository.findByClienteIdOrderByIdDesc(id);
     }
 
-    
     public Reserva crearOActualizar(ReservaForm form) {
-        Reserva reserva = (form.getId() != null)
-                ? reservaRepository.findById(form.getId()).orElse(new Reserva())
-                : new Reserva();
+        return guardarReserva(form, form.getEstado(), form.getEstadoPago());
+    }
 
-        if (form.getFechaInicio() == null || form.getFechaFin() == null || !form.getFechaFin().isAfter(form.getFechaInicio())) {
-            throw new IllegalArgumentException("La fecha de fin debe ser posterior a la fecha de inicio");
-        }
-
-        reserva.setFechaInicio(form.getFechaInicio());
-        reserva.setFechaFin(form.getFechaFin());
-        reserva.setEstado(form.getEstado());
-
-        Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
-        reserva.setCliente(cliente);
-
-        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
-        reserva.setAlojamiento(alojamiento);
-
-        if (existeSolapamiento(form.getAlojamientoId(), form.getFechaInicio(), form.getFechaFin(), form.getId())) {
-            throw new IllegalArgumentException("Las fechas de la reserva se solapan con otra existente");
-        }
-
-        double totalCalculado = calcularTotal(
-            form.getAlojamientoId(),
-            form.getFechaInicio(),
-            form.getFechaFin()
-        );
-
-        reserva.setPrecioTotal(totalCalculado);
-        reserva.setFormaPago(form.getFormaPago());
-        reserva.setEstadoPago(form.getEstadoPago());
-
-        Reserva reservaGuardada = reservaRepository.save(reserva);
-
-         String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
-         String mensaje = ""; 
-
-         if(form.getEstado().equals(EstadoReserva.CANCELADA)){
-            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
-                + "Tu petición de reserva del "
-                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido CANCELADA." + ".\n\n"
-                + "Precio total: " + totalCalculado  + " €.\n\n"
-                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
-                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
-                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
-                + "Gracias por confiar en nosotros.\n\n";
-            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
-         }else if(form.getEstado().equals(EstadoReserva.RECHAZADA)){
-            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
-                + "Tu petición de reserva del "
-                + form.getFechaInicio() + " al " + form.getFechaFin() + " se encuentra en estado RECHAZADA." + ".\n\n"
-                + "Precio total: " + totalCalculado  + " €.\n\n"
-                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
-                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
-                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
-                + "Gracias por confiar en nosotros.\n\n";
-            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
-         }else if(form.getEstado().equals(EstadoReserva.PENDIENTE)){
-            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
-                + "Tu petición de reserva del "
-                + form.getFechaInicio() + " al " + form.getFechaFin() + " se encuentra en estado PENDIENTE." + ".\n\n"
-                + "Precio total: " + totalCalculado  + " €.\n\n"
-                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
-                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
-                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
-                + "Gracias por confiar en nosotros.\n\n";
-            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
-         }else if(form.getEstado().equals(EstadoReserva.CONFIRMADA)){
-            mensaje = "Hola " + cliente.getNombre() + ",\n\n"
-                + "Tu petición de reserva del "
-                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido CONFIRMADA."  + ".\n"
-                + "Esperamos con gusto su visita" + ".\n\n"
-                + "Precio total: " + totalCalculado  + " €.\n\n"
-                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
-                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
-                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
-                + "Gracias por confiar en nosotros.\n\n";
-            emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
-         }
-
-        return reservaGuardada;
+    public Reserva crearReservaCliente(ReservaForm form) {
+        return guardarReserva(form, EstadoReserva.PENDIENTE, EstadoPago.PENDIENTE);
     }
 
 
-    public Reserva crearReservaCliente(ReservaForm form) {
-        Reserva reserva = (form.getId() != null)
-                ? reservaRepository.findById(form.getId()).orElse(new Reserva())
-                : new Reserva();
+    private Reserva guardarReserva(ReservaForm form, EstadoReserva estado, EstadoPago estadoPago) {
+            validarFechas(form);
 
-        if (form.getFechaInicio() == null || form.getFechaFin() == null || !form.getFechaFin().isAfter(form.getFechaInicio())) {
+            Reserva reserva = obtenerReserva(form.getId());
+
+            Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
+            Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
+
+            validarSolapamiento(form);
+
+            double total = calcularTotal(
+                form.getAlojamientoId(),
+                form.getFechaInicio(),
+                form.getFechaFin()
+            );
+
+            rellenarDatosReserva(reserva, form, cliente, alojamiento, estado, estadoPago, total);
+
+            Reserva reservaGuardada = reservaRepository.save(reserva);
+
+            enviarEmailReserva(cliente, alojamiento, form, estado, total);
+
+            return reservaGuardada;
+        }
+
+        private static final Map<EstadoReserva, String> PLANTILLAS_ESTADO = Map.of(
+            EstadoReserva.CANCELADA, "ha sido CANCELADA.",
+            EstadoReserva.RECHAZADA, "se encuentra en estado RECHAZADA.",
+            EstadoReserva.PENDIENTE, "se encuentra en estado PENDIENTE.",
+            EstadoReserva.CONFIRMADA, "ha sido CONFIRMADA.\nEsperamos con gusto su visita."
+        );
+
+        private void enviarEmailReserva(
+            Usuario cliente,
+            Alojamiento alojamiento,
+            ReservaForm form,
+            EstadoReserva estado,
+            double total) {
+
+        String asunto = String.format(
+            "Confirmación de reserva en %s",
+            alojamiento.getNombre()
+        );
+
+        String textoEstado = PLANTILLAS_ESTADO.getOrDefault(
+            estado,
+            "ha sido recibida."
+        );
+
+        String mensaje = String.format("""
+            Hola %s,
+
+            Tu petición de reserva del %s al %s %s
+
+            Precio total: %.2f €.
+
+            Forma de pago: %s.
+
+            Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644.
+            Si no, se le cobrará directamente en el alojamiento a su llegada.
+
+            Gracias por confiar en nosotros.
+            """,
+            cliente.getNombre(),
+            form.getFechaInicio(),
+            form.getFechaFin(),
+            textoEstado,
+            total,
+            form.getFormaPago()
+        );
+
+        emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
+    }
+
+    private void validarFechas(ReservaForm form) {
+        if (form.getFechaInicio() == null 
+                || form.getFechaFin() == null 
+                || !form.getFechaFin().isAfter(form.getFechaInicio())) {
             throw new IllegalArgumentException("La fecha de fin debe ser posterior a la fecha de inicio");
         }
+    }
+
+    private Reserva obtenerReserva(Long id) {
+        if (id != null) {
+            return reservaRepository.findById(id).orElse(new Reserva());
+        }
+        return new Reserva();
+    }
+
+    private void validarSolapamiento(ReservaForm form) {
+        if (existeSolapamiento(
+                form.getAlojamientoId(),
+                form.getFechaInicio(),
+                form.getFechaFin(),
+                form.getId())) {
+            throw new IllegalArgumentException("Las fechas de la reserva se solapan con otra existente");
+        }
+    }
+
+    private void rellenarDatosReserva(
+            Reserva reserva,
+            ReservaForm form,
+            Usuario cliente,
+            Alojamiento alojamiento,
+            EstadoReserva estado,
+            EstadoPago estadoPago,
+            double total) {
 
         reserva.setFechaInicio(form.getFechaInicio());
         reserva.setFechaFin(form.getFechaFin());
-        reserva.setEstado(EstadoReserva.PENDIENTE);
-
-        Usuario cliente = usuarioRepository.findById(form.getClienteId()).orElseThrow();
+        reserva.setEstado(estado);
         reserva.setCliente(cliente);
-
-        Alojamiento alojamiento = alojamientoRepository.findById(form.getAlojamientoId()).orElseThrow();
         reserva.setAlojamiento(alojamiento);
-
-        double totalCalculado = calcularTotal(
-            form.getAlojamientoId(),
-            form.getFechaInicio(),
-            form.getFechaFin()
-        );
-        reserva.setPrecioTotal(totalCalculado);
-
+        reserva.setPrecioTotal(total);
         reserva.setFormaPago(form.getFormaPago());
-        reserva.setEstadoPago(EstadoPago.PENDIENTE);
-
-        if (existeSolapamiento(form.getAlojamientoId(), form.getFechaInicio(), form.getFechaFin(), form.getId())) {
-            throw new IllegalArgumentException("Las fechas de la reserva se solapan con otra existente");
-        }
-
-        Reserva reservaGuardada = reservaRepository.save(reserva);
-
-        String asunto = "Confirmación de reserva en " + alojamiento.getNombre();
-        String mensaje = "Hola " + cliente.getNombre() + ",\n\n"
-                + "Tu petición de reserva del "
-                + form.getFechaInicio() + " al " + form.getFechaFin() + " ha sido recibida." + ".\n"
-                + "Recibirás otro email con la confirmación" + ".\n\n"
-                + "Precio total: " + totalCalculado  + " €.\n\n"
-                + "Forma de pago: " + form.getFormaPago() + ".\n\n"
-                + "Si su forma de pago ha sido mediante transferencia, debe ingresar la cantidad correspondiente en la cuenta ES95 4433 7788 9855 5252 6644." 
-                + "Si no, se le cobrará directamente en el alojamiento a su llegada"+ ".\n\n"
-                + "Gracias por confiar en nosotros.\n\n";
-
-        emailService.enviarCorreo(cliente.getEmail(), asunto, mensaje);
-
-        return reservaGuardada;
+        reserva.setEstadoPago(estadoPago);
     }
 
     private boolean existeSolapamiento(Long alojamientoId, LocalDate inicio, LocalDate fin, Long reservaIdActual) {

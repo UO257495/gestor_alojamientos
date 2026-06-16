@@ -56,17 +56,14 @@ public class SecurityConfig {
             .logoutSuccessUrl("/inicio")
             .permitAll());
 
-        // Página de acceso denegado (403)
         http.exceptionHandling(ex -> ex
             .accessDeniedPage("/error/403")
         );
 
-        // Las reglas más específicas necesitan estar primero, seguidas por las más generales
         http.authorizeHttpRequests(authorize -> authorize
-            // Recursos públicos (estáticos)
+
             .requestMatchers("/css/**", "/img/**", "/fontawesome/**", "/js/**").permitAll()
 
-            // Públicos (login/registro)
             .requestMatchers(
                 "/inicio", 
                 "/login", 
@@ -80,8 +77,6 @@ public class SecurityConfig {
 
             .requestMatchers("/gestion/usuarios/perfil").authenticated()
             
-
-            // lo demás requiere autenticación
             .anyRequest().authenticated()
         );
 

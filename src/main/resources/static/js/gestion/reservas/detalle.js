@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    let fechasOcupadas = []; // lista de intervalos ocupados
+    let fechasOcupadas = []; 
 
     //-------------------------------------------------------------------------------------------------
     // Buscadores Mejorados (Tom Select)
@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     });
 
-    // Desactivar inputs hasta seleccionar alojamiento
     fechaInicioInput.setAttribute('readonly', true);
     fechaFinInput.setAttribute('readonly', true);
 
@@ -93,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para actualizar calendarios con fechas ocupadas
     //-------------------------------------------------------------------------------------------------
     function actualizarCalendarios() {
-        // Generar lista de todas las fechas ocupadas posteriores a hoy
         const fechasBloqueadas = fechasOcupadas.flatMap(rango => {
             const lista = [];
             let fecha = new Date(rango.inicio);
@@ -127,30 +125,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const partes = fechaInicioInput.value.split('/');
             const fechaInicioSeleccionada = new Date(partes[2], partes[1] - 1, partes[0]);
             
-            // 1. La fecha mínima de check-out es 1 día después del check-in
             const fechaMinFin = new Date(fechaInicioSeleccionada.getTime() + 24 * 60 * 60 * 1000);
 
-            // 2. Encontrar la *próxima* fecha de check-in bloqueada *después* de nuestro check-in
             let proximaFechaBloqueada = null;
             
-            // Ordenamos las fechas bloqueadas para encontrar la más cercana
             const fechasBloqueadasOrdenadas = fechasBloqueadas
                 .map(d => d.getTime())
                 .sort((a, b) => a - b);
 
             for (const fechaTimestamp of fechasBloqueadasOrdenadas) {
-                // (Ignoramos el setTime(0,0,0,0) por simplicidad, JS lo maneja)
                 if (fechaTimestamp > fechaInicioSeleccionada.getTime()) {
                     proximaFechaBloqueada = new Date(fechaTimestamp);
                     break;
                 }
             }
 
-            // 3. Deshabilitar todas las fechas *posteriores* a esa próxima reserva
-            // El usuario SÍ puede hacer check-out el mismo día que otro hace check-in
             let fechasDeshabilitadasFin = [];
             if (proximaFechaBloqueada) {
-                // Empezamos a deshabilitar el día *siguiente* al inicio de la próxima reserva
                 let fecha = new Date(proximaFechaBloqueada.getTime() + 24 * 60 * 60 * 1000);
                 const limite = new Date(hoy.getFullYear() + 10, hoy.getMonth(), hoy.getDate());
 
@@ -163,12 +154,11 @@ document.addEventListener('DOMContentLoaded', function() {
             tdFechaFin.updateOptions({
                 restrictions: {
                     minDate: fechaMinFin,
-                    disabledDates: fechasDeshabilitadasFin // Solo deshabilitamos las fechas futuras
+                    disabledDates: fechasDeshabilitadasFin 
                 }
             });
 
         } else {
-            // Si no hay fecha de inicio, deshabilitamos todo lo que ya está bloqueado
              tdFechaFin.updateOptions({
                 restrictions: {
                     minDate: hoy,
@@ -187,10 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (dataDate) {
                     const d = new Date(dataDate);
                     
-                    // 1. Limpiamos la clase primero
                     tdCell.classList.remove('fecha-ocupada'); 
 
-                    // 2. Si está ocupada, la volvemos a añadir
                     if (esFechaOcupada(d)) {
                         tdCell.classList.add('fecha-ocupada');
                     }
@@ -226,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const alojamientoId = alojamientoSelect.value;
 
         if (alojamientoId) {
-            // Activamos los inputs para poder usar Tempus Dominus
             fechaInicioInput.removeAttribute('readonly');
             fechaFinInput.removeAttribute('readonly');
 

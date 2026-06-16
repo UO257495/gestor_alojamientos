@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let fechasOcupadas = [];
 
-    // Inicializar Tempus Dominus
     const tdFechaInicio = new tempusDominus.TempusDominus(fechaInicio, {
         localization: { locale: 'es', format: 'dd/MM/yyyy' },
         restrictions: { minDate: hoy }
@@ -85,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tdFechaFin.updateOptions({ restrictions: { minDate: hoy, disabledDates: fechasBloqueadas } });
         }
 
-        // Marcar fechas ocupadas en rojo
         [tdFechaInicio, tdFechaFin].forEach(td => {
             td._calendar?.querySelectorAll('td').forEach(tdCell => {
                 const dataDate = tdCell.getAttribute('data-date');
@@ -134,12 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Inicializar fechas ocupadas según alojamientoId
     if (alojamientoIdInput.value) {
         cargarFechasOcupadas(alojamientoIdInput.value);
     }
 
-    //Gestion forma de pago
     const selectPago = document.getElementById("formaPagoSelect");
     const formaPagoCard = document.getElementById("formaPagoCard");
 

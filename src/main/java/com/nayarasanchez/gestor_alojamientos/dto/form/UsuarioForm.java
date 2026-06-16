@@ -3,7 +3,6 @@ package com.nayarasanchez.gestor_alojamientos.dto.form;
 import com.nayarasanchez.gestor_alojamientos.model.Rol;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;

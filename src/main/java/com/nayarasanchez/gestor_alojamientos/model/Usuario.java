@@ -62,7 +62,6 @@ public class Usuario implements UserDetails {
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convención de Spring Security: "ROLE_" + nombre del rol
         return Collections.singleton(() -> "ROLE_" + rol.name());
     }
 

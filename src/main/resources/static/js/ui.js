@@ -30,14 +30,14 @@ function mostrarConfirmacionModal(titulo, contenido, callbackSi, callbackNo) {
     document.querySelector('#confirmacionModal .modal-body').innerHTML = contenido;
 
     const btnSi = document.querySelector('#confirmacionModal #btnSi');
-    btnSi.replaceWith(btnSi.cloneNode(true));  // Clona el nodo eliminando todas las suscripciones a eventos anteriores
+    btnSi.replaceWith(btnSi.cloneNode(true));  
     document.querySelector('#confirmacionModal #btnSi').addEventListener('click', (e) => {
         if (callbackSi !== undefined) callbackSi();
         modal.hide();
     });
 
     const btnNo = document.querySelector('#confirmacionModal #btnNo');
-    btnNo.replaceWith(btnNo.cloneNode(true));  // Clona el nodo eliminando todas las suscripciones a eventos anteriores
+    btnNo.replaceWith(btnNo.cloneNode(true));  
     document.querySelector('#confirmacionModal #btnNo').addEventListener('click', (e) => {
         if (callbackNo !== undefined) callbackNo();
         modal.hide();

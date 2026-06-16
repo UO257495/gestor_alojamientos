@@ -91,7 +91,6 @@
         let markers = L.featureGroup().addTo(map);
         mostrarMensajeInicial();
 
-        // Función para convertir fechas de dd/MM/yyyy a yyyy-MM-dd
         function parseFecha(fecha) {
             if (!fecha) return null;
             const [dia, mes, anio] = fecha.split('/');
@@ -134,7 +133,6 @@
             `;
         }
 
-        // Función para pintar alojamientos en el mapa y listado
         function pintarAlojamientos(alojamientos) {
             markers.clearLayers();
             const resultadosDiv = document.getElementById('resultados');
@@ -163,7 +161,6 @@
                     markers.addLayer(marker);
                 }
 
-                // Listado HTML
                 const card = document.createElement('div');
                 card.className = 'col-md-4 mb-3';
                 card.innerHTML = `
@@ -185,7 +182,6 @@
             }
         }
 
-        // Evento del formulario para filtrar
         const form = document.getElementById('busquedaForm');
         form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -195,7 +191,6 @@
         const fechaInicio = document.getElementById('fechaInicio').value;
         const fechaFin = document.getElementById('fechaFin').value;
 
-        // Debe existir al menos un filtro
         if (!ubicacion && !personas && !fechaInicio && !fechaFin) {
             mostrarMensajeInicial();
             return;
@@ -217,7 +212,6 @@
         .then(alojamientos => pintarAlojamientos(alojamientos));
     });
 
-        // Inicializar Tempus Dominus para fechas de búsqueda
         const fechaInicioInput = document.getElementById('fechaInicio');
         const fechaFinInput = document.getElementById('fechaFin');
 
@@ -234,16 +228,12 @@
             restrictions: { minDate: hoy }
         });
 
-        // Mantener inputs sincronizados con la selección del calendario
-        // Evitar que fechaFin sea anterior a fechaInicio
         tdFechaInicio.subscribe('change.td', e => {
             if (e.date) {
                 fechaInicioInput.value = e.date.toLocaleDateString('es-ES');
 
-                // Actualizamos la fecha mínima de fechaFin
                 tdFechaFin.updateOptions({ restrictions: { minDate: e.date } });
 
-                // Si la fechaFin actual es menor, la borramos
                 const fechaFinActual = new Date(fechaFinInput.value.split('/').reverse().join('-'));
                 if (fechaFinInput.value && fechaFinActual < e.date) {
                     fechaFinInput.value = '';

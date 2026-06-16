@@ -28,17 +28,10 @@ public class BusquedaAlojamientosService {
     @PersistenceContext
     private EntityManager em;
 
-    /**
-     * Devuelve todos los alojamientos sin filtro
-     */
     public List<Alojamiento> listarTodos() {
         return alojamientoRepository.findAll();
     }
 
-
-     /**
-     * Busca alojamientos según filtros del formulario usando Criteria API
-     */
     public List<Alojamiento> buscarPorFiltro(BusquedaAlojamientoForm form) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Alojamiento> cq = cb.createQuery(Alojamiento.class);
@@ -46,18 +39,15 @@ public class BusquedaAlojamientosService {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        // Filtro por dirección / ubicación
         if (form.getUbicacion() != null && !form.getUbicacion().isBlank()) {
             predicates.add(cb.like(cb.lower(alojamiento.get("direccion")),
                                    "%" + form.getUbicacion().toLowerCase() + "%"));
         }
 
-        // Filtro por personas (capacidad >=)
         if (form.getPersonas() != null && form.getPersonas() > 0) {
             predicates.add(cb.ge(alojamiento.get("capacidad"), form.getPersonas()));
         }
 
-        // Filtro por fechas (excluir alojamientos con reservas confirmadas o pendientes que se solapen)
         if (form.getFechaInicio() != null && form.getFechaFin() != null) {
             Subquery<Reserva> subquery = cq.subquery(Reserva.class);
             Root<Reserva> reserva = subquery.from(Reserva.class);
@@ -66,13 +56,12 @@ public class BusquedaAlojamientosService {
             Predicate mismoAlojamiento = cb.equal(reserva.get("alojamiento"), alojamiento);
             Predicate estadoBloquea = reserva.get("estado").in("CONFIRMADA", "PENDIENTE");
             Predicate fechaSolapada = cb.and(
-                    cb.lessThan(reserva.get("fechaInicio"), form.getFechaFin()), // < en vez de <=
-                    cb.greaterThan(reserva.get("fechaFin"), form.getFechaInicio()) // > en vez de >=
+                    cb.lessThan(reserva.get("fechaInicio"), form.getFechaFin()), 
+                    cb.greaterThan(reserva.get("fechaFin"), form.getFechaInicio()) 
             );
 
             subquery.where(cb.and(mismoAlojamiento, estadoBloquea, fechaSolapada));
 
-            // Excluir alojamientos que tengan reservas que se solapen
             predicates.add(cb.not(cb.exists(subquery)));
         }
 

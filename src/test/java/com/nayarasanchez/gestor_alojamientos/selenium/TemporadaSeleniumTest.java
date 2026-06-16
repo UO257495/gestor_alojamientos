@@ -12,6 +12,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 class TemporadaSeleniumTest {
 
     @Test
@@ -19,8 +21,10 @@ class TemporadaSeleniumTest {
         WebDriver driver = new ChromeDriver();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        String email = System.getenv("TEST_EMAIL");
-        String password = System.getenv("TEST_PASS");
+        Dotenv dotenv = Dotenv.load();
+
+        String email = dotenv.get("TEST_EMAIL");
+        String password = dotenv.get("TEST_PASS");
 
         try {
             driver.get("http://localhost:8080/login");

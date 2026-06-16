@@ -13,12 +13,12 @@ public class DatabaseConfig {
 
     @Bean
     public DataSource dataSource() {
-        Dotenv dotenv = Dotenv.load(); // Carga .env automáticamente desde la raíz del proyecto
+        Dotenv dotenv = Dotenv.load(); 
 
         return DataSourceBuilder.create()
-                .url(dotenv.get("DB_URL"))         // jdbc:postgresql://host:port/db
-                .username(dotenv.get("DB_USER"))   // Usuario maestro de RDS
-                .password(dotenv.get("DB_PASSWORD")) // Contraseña
+                .url(dotenv.get("DB_URL"))      
+                .username(dotenv.get("DB_USER"))   
+                .password(dotenv.get("DB_PASSWORD")) 
                 .driverClassName("org.postgresql.Driver")
                 .build();
     }

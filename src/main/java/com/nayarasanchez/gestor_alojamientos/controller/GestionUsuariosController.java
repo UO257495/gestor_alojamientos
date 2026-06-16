@@ -210,7 +210,7 @@ public class GestionUsuariosController {
         }
 
         Usuario usuarioExistente = usuarioService.obtenerUsuarioPorId(usuarioForm.getId()).orElseThrow();
-        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password); // si password vacío, el service debe ignorarla
+        usuarioService.editarUsuario(usuarioExistente, usuarioForm, password); 
 
         redirectAttributes.addFlashAttribute("mensajeUsuario",
             MensajeUsuario.mensajeCorrecto(messageSource.getMessage("formulario.usuario.modificado", null, locale)));

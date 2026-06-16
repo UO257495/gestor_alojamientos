@@ -11,17 +11,14 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Marcador
     let marker = L.marker([43.35, -5.85], { draggable: true }).addTo(map);
 
-    // Actualizar inputs al mover marcador
     marker.on('moveend', () => {
         const pos = marker.getLatLng();
         document.getElementById('latitud').value = pos.lat.toFixed(6);
         document.getElementById('longitud').value = pos.lng.toFixed(6);
     });
 
-    // --- Geocodificación al escribir dirección ---
     const direccionInput = document.getElementById('direccion');
     direccionInput.addEventListener('blur', async () => {
         const address = direccionInput.value.trim();
@@ -35,11 +32,9 @@
                 const lat = parseFloat(data[0].lat);
                 const lon = parseFloat(data[0].lon);
 
-                // Actualizar inputs
                 document.getElementById('latitud').value = lat.toFixed(6);
                 document.getElementById('longitud').value = lon.toFixed(6);
 
-                // Mover marcador y centrar mapa
                 marker.setLatLng([lat, lon]);
                 map.setView([lat, lon], 15);
             }
@@ -48,7 +43,6 @@
         }
     });
 
-    // --- Previsualización de imagen ---
     const fotoInput = document.getElementById('foto');
     const preview = document.getElementById('preview');
     fotoInput.addEventListener('change', (event) => {
@@ -66,7 +60,6 @@
         }
     });
 
-    // --- Formateo de tarifa base ---
     const tarifaInput = document.getElementById('tarifaBaseInput');
 
     tarifaInput.addEventListener('input', () => {
@@ -88,7 +81,6 @@
         if (!/^\d*\.?\d*$/.test(paste)) e.preventDefault();
     });
 
-    // --- Formateo de capacidad ---
     const capacidadInput = document.getElementById('capacidadInput');
     capacidadInput.addEventListener('input', () => {
         capacidadInput.value = capacidadInput.value.replace(/[^0-9]/g, '');

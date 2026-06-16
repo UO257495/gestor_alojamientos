@@ -24,9 +24,6 @@ public class SupabaseStorageService {
         this.restTemplate = new RestTemplate();
     }
 
-    /**
-     * Sube un archivo y devuelve la URL pública.
-     */
     public String uploadFile(MultipartFile file) throws IOException {
         String originalName = file.getOriginalFilename() != null
                 ? file.getOriginalFilename().replace(" ", "_")
@@ -59,9 +56,6 @@ public class SupabaseStorageService {
         }
     }
 
-    /**
-     * Descarga el contenido del archivo.
-     */
     public byte[] downloadFile(String fileName) {
         String url = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName;
 
@@ -73,13 +67,9 @@ public class SupabaseStorageService {
         return response.getBody();
     }
 
-    /**
-     * Elimina un archivo a partir de su URL.
-     */
     public void deleteFile(String fileUrl) {
         if (fileUrl == null || fileUrl.isBlank()) return;
 
-        // Extraer el nombre del archivo
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
         String url = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName;
 
